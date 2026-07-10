@@ -1,0 +1,34 @@
+name: Deploy Alpaica to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Upload static site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare deploy folder
+        run: |
+          mkdir -p dist
+          cp outputs/index.html dist/index.html
+          cp outputs/europe-cities.js dist/europe-cities.js
+          cp outputs/meetway-hero.png dist/meetway-hero.png
+
+      - name: Deploy to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ${{ secrets.HOSTINGER_FTP_PROTOCOL }}
+          port: ${{ secrets.HOSTINGER_FTP_PORT }}
+          local-dir: ./dist/
+          server-dir: ${{ secrets.HOSTINGER_FTP_TARGET_DIR }}

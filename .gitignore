@@ -1,0 +1,5 @@
+outputs/.env
+outputs/server-start.log
+outputs/server-start.err
+node_modules/
+dist/
