@@ -22,6 +22,34 @@ jobs:
           cp outputs/europe-cities.js dist/europe-cities.js
           cp outputs/meetway-hero.png dist/meetway-hero.png
 
+      - name: Check Hostinger secrets
+        env:
+          HOSTINGER_FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
+          HOSTINGER_FTP_USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          HOSTINGER_FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          HOSTINGER_FTP_PROTOCOL: ${{ secrets.HOSTINGER_FTP_PROTOCOL }}
+          HOSTINGER_FTP_PORT: ${{ secrets.HOSTINGER_FTP_PORT }}
+          HOSTINGER_FTP_TARGET_DIR: ${{ secrets.HOSTINGER_FTP_TARGET_DIR }}
+        run: |
+          missing=0
+          for name in HOSTINGER_FTP_HOST HOSTINGER_FTP_USERNAME HOSTINGER_FTP_PASSWORD HOSTINGER_FTP_PROTOCOL HOSTINGER_FTP_PORT HOSTINGER_FTP_TARGET_DIR; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is missing. Add it in GitHub: Settings -> Secrets and variables -> Actions -> New repository secret."
+              missing=1
+            fi
+          done
+          if echo "$HOSTINGER_FTP_HOST" | grep -Eq '://|/'; then
+            echo "::error::HOSTINGER_FTP_HOST must be only the hostname or IP address, for example ftp.alpaica.com or 123.123.123.123. Do not include ftp://, https://, public_html, or slashes."
+            missing=1
+          fi
+          if [ "$HOSTINGER_FTP_PROTOCOL" != "ftp" ] && [ "$HOSTINGER_FTP_PROTOCOL" != "ftps" ]; then
+            echo "::error::HOSTINGER_FTP_PROTOCOL must be ftp or ftps."
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
       - name: Deploy to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

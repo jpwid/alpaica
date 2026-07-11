@@ -23,6 +23,20 @@ Maak deze secrets aan:
 
 Zet het wachtwoord nooit in een bestand in deze map en plak het liever niet in chat.
 
+Als GitHub Actions meldt `Input required and not supplied: username`, dan mist bijna altijd deze secret exact:
+
+`HOSTINGER_FTP_USERNAME`
+
+Let op de exacte naam: hoofdletters, underscores en geen spaties. De secret moet onder **Repository secrets** staan, niet alleen onder Variables.
+
+Als GitHub Actions meldt `getaddrinfo ENOTFOUND *** (control socket)`, dan is `HOSTINGER_FTP_HOST` niet oplosbaar. Controleer dan:
+
+- Gebruik alleen de hostnaam of het IP-adres, dus geen `ftp://`, geen `https://` en geen `/public_html`.
+- Goed voorbeeld: `ftp.alpaica.com`
+- Ook goed: het server IP-adres uit Hostinger hPanel
+- Fout voorbeeld: `ftp://ftp.alpaica.com/public_html`
+- Als `alpaica.com` nog niet naar Hostinger wijst, gebruik tijdelijk het FTP-serveradres of IP-adres dat Hostinger in hPanel toont.
+
 ## Wat wordt online gezet
 
 De workflow uploadt alleen:
