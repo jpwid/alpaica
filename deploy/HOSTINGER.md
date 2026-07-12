@@ -19,7 +19,6 @@ Maak deze secrets aan:
 - `HOSTINGER_FTP_PASSWORD`: je FTP wachtwoord
 - `HOSTINGER_FTP_PROTOCOL`: meestal `ftps`, soms `ftp`
 - `HOSTINGER_FTP_PORT`: meestal `21`
-- `HOSTINGER_FTP_TARGET_DIR`: meestal `public_html/`
 
 Zet het wachtwoord nooit in een bestand in deze map en plak het liever niet in chat.
 
@@ -49,7 +48,9 @@ Deze bestanden komen online:
 
 De lokale backend `outputs/server.js`, `.env`, `.env.example` en `STARTEN.md` worden uitgesloten in deze statische deploy.
 
-Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow, staat `HOSTINGER_FTP_TARGET_DIR` nog op een pad met `/outputs/`, of upload je via een ander proces. Push deze workflowwijziging opnieuw en verwijder daarna de foutieve map `public_html/outputs/` in Hostinger File Manager.
+De workflow uploadt nu vast naar `public_html/`. De secret `HOSTINGER_FTP_TARGET_DIR` wordt niet meer gebruikt, zodat er niet per ongeluk naar `public_html/outputs/` gedeployed kan worden.
+
+Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow of upload je via een ander proces. Push deze workflowwijziging opnieuw en verwijder daarna de foutieve map `public_html/outputs/` in Hostinger File Manager.
 
 In de GitHub Actions-log moet je bij `Prepare webroot files` deze regels zien:
 
