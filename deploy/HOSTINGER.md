@@ -38,6 +38,14 @@ Als GitHub Actions meldt `getaddrinfo ENOTFOUND *** (control socket)`, dan is `H
 
 ## Wat wordt online gezet
 
+Er zijn twee mogelijke deployment-routes:
+
+1. **Hostinger GitHub Redeploy**
+   Hostinger pakt de bestanden uit de repository-root. Daarom staan `index.html`, `europe-cities.js` en `meetway-hero.png` ook direct in de root van deze repo.
+
+2. **GitHub Actions FTP Deploy**
+   Deze workflow kopieert dezelfde bestanden vanuit `outputs/` naar `deploy-root/` en uploadt ze daarna naar `public_html/`.
+
 De workflow kopieert de publieke bestanden eerst naar `deploy-root/` en uploadt daarna de inhoud van die map naar de webroot. Daardoor kan de map `outputs/` niet mee naar Hostinger.
 
 Deze bestanden komen online:

@@ -1,0 +1,2977 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alpaica - beste ontmoetingsplek vinden</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172126;
+      --muted: #5d6b73;
+      --line: #d8e0e3;
+      --paper: #ffffff;
+      --mist: #f4f8f8;
+      --teal: #087f8c;
+      --teal-dark: #065965;
+      --coral: #e85d4f;
+      --gold: #f5b84b;
+      --green: #2f9d68;
+      --shadow: 0 16px 44px rgba(23, 33, 38, .13);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f7f7f4;
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .hero {
+      min-height: auto;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background: #f7f7f4;
+      color: var(--ink);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px clamp(18px, 5vw, 56px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.08rem;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .24));
+    }
+
+    .brand-mark svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .brand-mark:not(:has(svg)) {
+      display: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 18px;
+      font-size: .95rem;
+    }
+
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .language-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .language-switch button {
+      min-width: 38px;
+      min-height: 32px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .language-switch button.active {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(220px, 360px) minmax(420px, 520px);
+      align-items: start;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 14px 0 34px;
+    }
+
+    .hero-copy {
+      max-width: 360px;
+      padding: 10px 0 0;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 360px;
+      font-size: clamp(1.55rem, 3vw, 2.6rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 650px;
+      font-size: clamp(1.02rem, 2vw, 1.32rem);
+      line-height: 1.55;
+      color: rgba(255, 255, 255, .92);
+    }
+
+    .search-panel {
+      background: transparent;
+      color: var(--ink);
+      border-radius: 8px;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 4px;
+      background: #e9f0f1;
+      border-radius: 8px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 8px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--paper);
+      color: var(--teal-dark);
+      box-shadow: 0 2px 10px rgba(23, 33, 38, .08);
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 11px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: .78rem;
+      font-weight: 760;
+      color: #415057;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(8, 127, 140, .13);
+    }
+
+    .people {
+      display: grid;
+      gap: 8px;
+    }
+
+    .person {
+      display: grid;
+      grid-template-columns: 1fr 1fr 42px;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .autocomplete-field {
+      position: relative;
+      display: block;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 12;
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 18px 38px rgba(23, 33, 38, .18);
+      padding: 6px;
+    }
+
+    .suggestions.open {
+      display: grid;
+      gap: 3px;
+    }
+
+    .suggestion {
+      width: 100%;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 0;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 10px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .suggestion:hover,
+    .suggestion.active {
+      background: #e8f5f4;
+    }
+
+    .suggestion strong {
+      font-size: .95rem;
+    }
+
+    .suggestion span {
+      color: var(--muted);
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--teal-dark);
+      cursor: pointer;
+    }
+
+    .trip-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-step {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #e3ebee;
+      border-radius: 8px;
+      background: #fbfdfd;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0;
+      font-size: .96rem;
+      color: var(--ink);
+    }
+
+    .step-number {
+      width: 25px;
+      height: 25px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 850;
+      flex: 0 0 auto;
+    }
+
+    .two-col,
+    .three-col {
+      display: grid;
+      gap: 10px;
+    }
+
+    .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .time-slider {
+      display: grid;
+      gap: 7px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .time-slider span {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: .78rem;
+      font-weight: 760;
+      color: #415057;
+    }
+
+    .time-window {
+      display: grid;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .dual-range {
+      position: relative;
+      min-height: 32px;
+      display: grid;
+      align-items: center;
+    }
+
+    .dual-range::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 6px;
+      border-radius: 999px;
+      background: #dfe9ea;
+    }
+
+    .dual-range input[type="range"] {
+      position: absolute;
+      width: 100%;
+      min-height: 32px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      pointer-events: none;
+      appearance: none;
+    }
+
+    .dual-range input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 2px 8px rgba(23, 33, 38, .25);
+      pointer-events: auto;
+      appearance: none;
+    }
+
+    .dual-range input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 2px 8px rgba(23, 33, 38, .25);
+      pointer-events: auto;
+    }
+
+    .toggle-row .removed-control {
+      display: none;
+    }
+
+    .toggle-row,
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .check-tile,
+    .choice-chip {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 11px;
+      font-size: .88rem;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .check-tile input,
+    .choice-chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .check-tile:has(input:checked),
+    .choice-chip:has(input:checked) {
+      border-color: rgba(8, 127, 140, .45);
+      background: #e8f5f4;
+      color: var(--teal-dark);
+      box-shadow: 0 0 0 3px rgba(8, 127, 140, .08);
+    }
+
+    .slider-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #415057;
+      font-size: .78rem;
+      font-weight: 760;
+    }
+
+    .trip-summary {
+      display: grid;
+      gap: 7px;
+      padding: 11px;
+      border-radius: 8px;
+      background: #f0f8f7;
+      color: var(--teal-dark);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .server-warning {
+      background: #fff4e0;
+      color: #875207;
+    }
+
+    .sort-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .sort-pill {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--teal-dark);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .sort-pill.active {
+      border-color: rgba(8, 127, 140, .45);
+      background: #e8f5f4;
+      box-shadow: 0 0 0 3px rgba(8, 127, 140, .08);
+    }
+
+    .legacy-panel,
+    .live-band {
+      display: none;
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--coral);
+      color: #fff;
+      font-weight: 850;
+      margin-top: 13px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(232, 93, 79, .28);
+    }
+
+    .secondary {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--teal-dark);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    main {
+      background: var(--paper);
+    }
+
+    .live-band {
+      background: #eef6f5;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .live-search {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) 145px 145px 100px 170px;
+      gap: 10px;
+      align-items: end;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(23, 33, 38, .08);
+    }
+
+    .live-search .primary {
+      margin: 0;
+    }
+
+    .provider-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    .status-dot.online {
+      background: var(--green);
+    }
+
+    .status-dot.error {
+      background: var(--coral);
+    }
+
+    .live-results {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .flight-result {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .flight-legs {
+      display: grid;
+      gap: 9px;
+    }
+
+    .flight-leg {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .flight-route {
+      font-weight: 850;
+    }
+
+    .flight-detail {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .flight-price {
+      min-width: 130px;
+      text-align: right;
+    }
+
+    .flight-price strong {
+      display: block;
+      color: var(--teal-dark);
+      font-size: 1.45rem;
+    }
+
+    .empty-state {
+      padding: 18px;
+      border: 1px dashed #aebdc1;
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .section {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 56px 0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.5rem);
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 520px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .results-layout {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .filters,
+    .score-card,
+    .city-card,
+    .insight {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .filters {
+      position: sticky;
+      top: 14px;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .range-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 4px;
+    }
+
+    input[type="range"] {
+      min-height: auto;
+      padding: 0;
+      accent-color: var(--teal);
+    }
+
+    .score-card {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff, #f2fbfa);
+    }
+
+    .score {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      background: conic-gradient(var(--teal) 0 86%, #dce8e9 86% 100%);
+      display: grid;
+      place-items: center;
+      justify-self: center;
+    }
+
+    .score span {
+      width: 94px;
+      height: 94px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--teal-dark);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    .score-copy h3,
+    .city-main h3 {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+    }
+
+    .score-copy p,
+    .city-main p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      background: #e8f5f4;
+      color: var(--teal-dark);
+      padding: 7px 10px;
+      font-size: .84rem;
+      font-weight: 760;
+    }
+
+    .city-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .city-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 16px;
+      align-items: center;
+    }
+
+    .flight-breakdown {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .flight-breakdown h4 {
+      margin: 0;
+      font-size: .92rem;
+    }
+
+    .traveler-flight,
+    .stay-option {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 7px;
+      background: var(--mist);
+      font-size: .84rem;
+    }
+
+    .traveler-flight {
+      grid-template-columns: minmax(94px, .8fr) minmax(0, 1.4fr) minmax(0, 1.4fr) auto;
+      align-items: center;
+    }
+
+    .traveler-flight b {
+      display: block;
+      color: var(--ink);
+    }
+
+    .traveler-flight span {
+      color: var(--muted);
+    }
+
+    .click-detail {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .click-detail summary {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px 12px;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 820;
+    }
+
+    .click-detail summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .click-detail summary::after {
+      content: "+";
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #e8f5f4;
+      color: var(--teal-dark);
+      font-weight: 900;
+    }
+
+    .click-detail[open] summary::after {
+      content: "-";
+    }
+
+    .detail-body {
+      display: grid;
+      gap: 8px;
+      padding: 0 12px 12px;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 10px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .detail-row b {
+      color: var(--ink);
+    }
+
+    .stay-breakdown {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .stay-breakdown h4 {
+      margin: 0;
+      font-size: .92rem;
+    }
+
+    .stay-option summary {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .stay-content {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .stay-thumb {
+      width: 78px;
+      aspect-ratio: 1.18;
+      border-radius: 7px;
+      background:
+        linear-gradient(140deg, rgba(255,255,255,.2), rgba(255,255,255,0) 42%),
+        linear-gradient(135deg, #f5b84b, #087f8c);
+      overflow: hidden;
+    }
+
+    .stay-thumb svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .provider-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      background: #fff4e0;
+      color: #875207;
+      padding: 5px 8px;
+      font-size: .76rem;
+      font-weight: 800;
+    }
+
+    .city-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(92px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      background: var(--mist);
+      border-radius: 7px;
+      padding: 10px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .price {
+      min-width: 128px;
+      text-align: right;
+    }
+
+    .price b {
+      display: block;
+      font-size: 1.45rem;
+      color: var(--teal-dark);
+    }
+
+    .price span {
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .insight {
+      padding: 18px;
+    }
+
+    .insight-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #fff4e0;
+      color: #875207;
+      margin-bottom: 14px;
+    }
+
+    .insight h3 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+    }
+
+    .insight p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .bottom-bar {
+      display: none;
+    }
+
+    @media (max-width: 880px) {
+      .hero {
+        min-height: auto;
+        background: #f7f7f4;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        width: min(100% - 28px, 580px);
+        padding: 12px 0 18px;
+      }
+
+      .hero-copy {
+        padding: 12px 0 0;
+      }
+
+      .search-panel {
+        margin-bottom: 14px;
+      }
+
+      .section {
+        width: min(100% - 28px, 680px);
+        padding: 36px 0;
+      }
+
+      .section-head {
+        display: grid;
+        gap: 10px;
+      }
+
+      .results-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .live-search {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .live-search .primary {
+        grid-column: 1 / -1;
+      }
+
+      .filters {
+        position: static;
+      }
+
+      .score-card {
+        grid-template-columns: 1fr;
+      }
+
+      .city-card {
+        grid-template-columns: 1fr;
+      }
+
+      .traveler-flight {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .time-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      .stay-content {
+        grid-template-columns: 70px minmax(0, 1fr);
+      }
+
+      .flight-result {
+        grid-template-columns: 1fr;
+      }
+
+      .flight-price {
+        min-width: 0;
+        text-align: left;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
+
+      .price {
+        min-width: 0;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+
+      .city-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .insights {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 4;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(255, 255, 255, .94);
+        border-top: 1px solid var(--line);
+        backdrop-filter: blur(12px);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .lead {
+        font-size: .94rem;
+        line-height: 1.38;
+      }
+
+      .search-panel {
+        padding: 12px;
+      }
+
+      .tabs {
+        margin-bottom: 10px;
+      }
+
+      .tab {
+        padding: 9px 6px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .people,
+      .secondary,
+      .primary {
+        grid-column: 1 / -1;
+      }
+
+      input,
+      select {
+        min-height: 42px;
+        padding: 8px 10px;
+      }
+
+      .person {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px;
+        gap: 6px;
+      }
+
+      .person .icon-button {
+        width: 36px;
+        height: 42px;
+      }
+
+      .city-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .live-search {
+        grid-template-columns: 1fr;
+      }
+
+      .live-search .primary {
+        grid-column: auto;
+      }
+
+      .flight-leg {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      .traveler-flight {
+        grid-template-columns: 1fr;
+      }
+
+      .click-detail summary {
+        grid-template-columns: 1fr auto;
+      }
+    }
+  </style>
+  <script src="europe-cities.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="topbar">
+      <div class="brand" aria-label="Alpaica">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <circle cx="32" cy="32" r="29" fill="#f5b84b"/>
+            <path d="M15 35c11-15 25-21 39-18-9 2-17 7-23 14 7-3 14-4 22-1-11 4-21 9-30 17 3-6 7-11 12-15-7 1-13 3-20 3Z" fill="#fff8df"/>
+            <path d="M18 39c10-7 19-10 29-9-8 3-15 8-22 15-3-1-5-3-7-6Z" fill="#087f8c"/>
+            <path d="M30 24c6-4 13-6 21-6-8 2-15 6-21 12-3 1-6 2-10 2 3-3 6-6 10-8Z" fill="#172126" opacity=".16"/>
+          </svg>
+        </span>
+        <span class="brand-mark">⌖</span>
+        <span>Alpaica</span>
+      </div>
+      <nav class="nav" aria-label="Hoofdnavigatie">
+        <a href="#zoek">Zoeken</a>
+        <a href="#resultaten">Resultaten</a>
+        <a href="#hoe">Hoe het werkt</a>
+      </nav>
+      <div class="language-switch" aria-label="Taal kiezen">
+        <button type="button" data-lang="de">DE</button>
+        <button type="button" data-lang="nl">NL</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 data-i18n="heroTitle">Dit is de leukste plek om elkaar te ontmoeten.</h1>
+      </div>
+
+      <form class="search-panel" id="zoek">
+        <div class="trip-form">
+          <section class="form-step" aria-labelledby="step-people">
+            <h2 class="step-title" id="step-people"><span><span class="step-number">1</span> Wie reist mee?</span></h2>
+            <div class="people" id="people">
+              <div class="person">
+                <label>Naam
+                  <input value="Anna" aria-label="Naam deelnemer 1">
+                </label>
+                <label>Woonplaats
+                  <span class="autocomplete-field">
+                    <input class="departure-input" value="Amsterdam" aria-label="Woonplaats deelnemer 1" autocomplete="off">
+                    <span class="suggestions" role="listbox"></span>
+                  </span>
+                </label>
+                <button class="icon-button" type="button" aria-label="Verwijder deelnemer">-</button>
+              </div>
+              <div class="person">
+                <label>Naam
+                  <input value="Luca" aria-label="Naam deelnemer 2">
+                </label>
+                <label>Woonplaats
+                  <span class="autocomplete-field">
+                    <input class="departure-input" value="Zurich" aria-label="Woonplaats deelnemer 2" autocomplete="off">
+                    <span class="suggestions" role="listbox"></span>
+                  </span>
+                </label>
+                <button class="icon-button" type="button" aria-label="Verwijder deelnemer">-</button>
+              </div>
+            </div>
+            <button class="secondary" id="addPerson" type="button">+ Reiziger toevoegen</button>
+          </section>
+
+          <section class="form-step" aria-labelledby="step-flight">
+            <h2 class="step-title" id="step-flight"><span><span class="step-number">2</span> Wanneer en hoe vliegen?</span></h2>
+            <div class="two-col">
+              <label>Aankomstdag
+                <input id="arrivalDate" type="date" value="2026-08-14">
+              </label>
+              <label>Terugreisdag
+                <input id="returnDate" type="date" value="2026-08-16">
+              </label>
+            </div>
+            <div class="time-grid">
+              <div class="time-window">
+                <div class="slider-label"><span id="outboundWindowTitle">Heen vliegen</span><strong id="outboundWindowLabel">09:00-12:00</strong></div>
+                <div class="dual-range" aria-label="Tijdvenster heenreis">
+                  <input id="outFrom" type="range" min="0" max="1430" step="30" value="540" aria-label="Heen vroegste tijd">
+                  <input id="outTo" type="range" min="0" max="1430" step="30" value="720" aria-label="Heen laatste tijd">
+                </div>
+              </div>
+              <div class="time-window">
+                <div class="slider-label"><span id="returnWindowTitle">Terug vliegen</span><strong id="returnWindowLabel">18:00-23:00</strong></div>
+                <div class="dual-range" aria-label="Tijdvenster terugreis">
+                  <input id="backFrom" type="range" min="0" max="1430" step="30" value="1080" aria-label="Terug vroegste tijd">
+                  <input id="backTo" type="range" min="0" max="1430" step="30" value="1380" aria-label="Terug laatste tijd">
+                </div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <label class="check-tile">
+                <input id="directOnly" type="checkbox" checked>
+                Alleen directe vluchten
+              </label>
+              <label class="check-tile removed-control" aria-hidden="true">
+                <input type="checkbox">
+                Geen heel vroege vluchten
+              </label>
+            </div>
+          </section>
+
+          <section class="form-step" aria-labelledby="step-stay">
+            <h2 class="step-title" id="step-stay"><span><span class="step-number">3</span> Waar willen jullie slapen?</span></h2>
+            <div class="choice-row" role="radiogroup" aria-label="Type accommodatie">
+              <label class="choice-chip"><input name="stayType" type="radio" value="Maakt niet uit" checked> Maakt niet uit</label>
+              <label class="choice-chip"><input name="stayType" type="radio" value="Hotel"> Hotel</label>
+              <label class="choice-chip"><input name="stayType" type="radio" value="Appartement"> Appartement</label>
+              <label class="choice-chip"><input name="stayType" type="radio" value="Hostel"> Hostel</label>
+            </div>
+            <div class="two-col">
+              <label>Luxegrad
+                <select id="luxury">
+                  <option>Gewoon goed</option>
+                  <option>3 sterren of hoger</option>
+                  <option>4 sterren of hoger</option>
+                  <option>Zo luxe mogelijk</option>
+                </select>
+              </label>
+              <label>Kamerindeling
+                <select id="roomType">
+                  <option>Maakt niet uit</option>
+                  <option>Iedereen eigen kamer</option>
+                  <option>Twee eenpersoonsbedden</option>
+                  <option>Tweepersoonskamers</option>
+                  <option>Meerdere kamers</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-step" aria-labelledby="step-budget">
+            <h2 class="step-title" id="step-budget"><span><span class="step-number">4</span> Budget en sfeer</span></h2>
+            <div class="slider-field">
+              <div class="slider-label"><span>Maximaal budget per persoon</span><strong id="tripBudgetValue">€420</strong></div>
+              <input id="tripBudget" type="range" min="120" max="1200" step="20" value="420">
+            </div>
+            <div class="slider-field">
+              <div class="slider-label"><span>Hoe belangrijk is accommodatiekwaliteit?</span><strong id="comfortValue">7/10</strong></div>
+              <input id="comfort" type="range" min="1" max="10" value="7">
+            </div>
+            <label>Wat moet de locatie hebben?
+              <textarea id="wishText" placeholder="Bijvoorbeeld: strand overdag, uitgaan in de avond, goed eten, shoppen, niet te duur.">Strand overdag, goed eten en 's avonds kunnen uitgaan.</textarea>
+            </label>
+          </section>
+
+          <div class="trip-summary" id="tripSummary" aria-live="polite"></div>
+          <div class="trip-summary server-warning" id="serverWarning" hidden></div>
+          <div class="trip-summary" id="liveApiStatus" hidden></div>
+          <button class="primary" type="button" id="searchButton">Beste plekken zoeken</button>
+        </div>
+      </form>
+
+      <form class="search-panel legacy-panel" id="zoek-oud" aria-hidden="true">
+        <div class="tabs" role="tablist" aria-label="Reisdoel">
+          <button class="tab active" type="button">Weekend</button>
+          <button class="tab" type="button">Dagtrip</button>
+          <button class="tab" type="button">Event</button>
+        </div>
+
+        <div class="field-grid">
+          <label>Wanneer
+            <input type="date" value="2026-08-14">
+          </label>
+          <label>Tot
+            <input type="date" value="2026-08-16">
+          </label>
+
+          <div class="people" id="people">
+            <div class="person">
+              <label>Naam
+                <input value="Anna" aria-label="Naam deelnemer 1">
+              </label>
+              <label>Vertrek
+                <span class="autocomplete-field">
+                  <input class="departure-input" value="Amsterdam" aria-label="Vertrekplaats deelnemer 1" autocomplete="off">
+                  <span class="suggestions" role="listbox"></span>
+                </span>
+              </label>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
+            </div>
+            <div class="person">
+              <label>Naam
+                <input value="Luca" aria-label="Naam deelnemer 2">
+              </label>
+              <label>Vertrek
+                <span class="autocomplete-field">
+                  <input class="departure-input" value="Zürich" aria-label="Vertrekplaats deelnemer 2" autocomplete="off">
+                  <span class="suggestions" role="listbox"></span>
+                </span>
+              </label>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
+            </div>
+            <div class="person">
+              <label>Naam
+                <input value="Sam" aria-label="Naam deelnemer 3">
+              </label>
+              <label>Vertrek
+                <span class="autocomplete-field">
+                  <input class="departure-input" value="London" aria-label="Vertrekplaats deelnemer 3" autocomplete="off">
+                  <span class="suggestions" role="listbox"></span>
+                </span>
+              </label>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
+            </div>
+          </div>
+
+          <button class="secondary" id="addPerson" type="button">+ Deelnemer toevoegen</button>
+          <button class="primary" type="button" id="searchButton">Beste plekken zoeken</button>
+        </div>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <div class="live-band">
+      <section class="section" id="live-zoeken">
+        <div class="section-head">
+          <h2>Live vluchten zoeken</h2>
+          <p>Zoek een echte route op datum. Alpaica vraagt prijzen via de gekoppelde provider op en houdt API-sleutels veilig op de server.</p>
+        </div>
+
+        <form class="live-search" id="liveFlightForm">
+          <label>Van
+            <span class="autocomplete-field">
+              <input class="departure-input" id="liveOrigin" placeholder="Stad of IATA-code" value="Amsterdam" autocomplete="off" required>
+              <span class="suggestions" role="listbox"></span>
+            </span>
+          </label>
+          <label>Naar
+            <span class="autocomplete-field">
+              <input class="departure-input" id="liveDestination" placeholder="Stad of IATA-code" value="Barcelona" autocomplete="off" required>
+              <span class="suggestions" role="listbox"></span>
+            </span>
+          </label>
+          <label>Vertrek
+            <input id="liveDepartureDate" type="date" required>
+          </label>
+          <label>Retour
+            <input id="liveReturnDate" type="date">
+          </label>
+          <label>Reizigers
+            <input id="liveAdults" type="number" min="1" max="9" value="1" required>
+          </label>
+          <button class="primary" id="liveSearchButton" type="submit">Zoek live prijzen</button>
+        </form>
+        <p class="provider-status" id="providerStatus"><span class="status-dot"></span><span>Provider controleren...</span></p>
+        <div class="live-results" id="liveResults" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <section class="section" id="resultaten">
+      <div class="section-head">
+        <h2>Voorbeeldresultaat</h2>
+        <p>Deze eerste versie gebruikt voorbeelddata om het productgevoel te tonen. Echte koppelingen kunnen later via vlucht-, trein- en hoteldata worden aangesloten.</p>
+      </div>
+
+      <div class="results-layout">
+        <aside class="filters" aria-label="Filters">
+          <div class="sort-pills" aria-label="Resultaten sorteren">
+            <button class="sort-pill active" type="button" data-sort="match">Beste match</button>
+            <button class="sort-pill" type="button" data-sort="price">Laagste prijs</button>
+          </div>
+          <label>Max. budget per persoon
+            <input id="budget" type="range" min="120" max="900" value="420">
+            <span class="range-row"><span>€120</span><strong id="budgetValue">€420</strong><span>€900</span></span>
+          </label>
+          <label>Reismix
+            <select>
+              <option>Vlucht + trein + auto</option>
+              <option>Alleen trein</option>
+              <option>Alleen vlucht</option>
+              <option>Geen nachtvluchten</option>
+            </select>
+          </label>
+        </aside>
+
+        <div>
+          <article class="score-card">
+            <div class="score" aria-label="Matchscore 86 van 100"><span>86</span></div>
+            <div class="score-copy">
+              <h3>Barcelona komt als beste match naar voren</h3>
+              <p>Goede directe verbindingen vanuit alle vertrekplaatsen, veel hotels beschikbaar en gunstige aankomsttijden voor een weekend.</p>
+              <div class="chips">
+                <span class="chip">3 directe routes</span>
+                <span class="chip">Gem. 4u 15m reistijd</span>
+                <span class="chip">Hotels vanaf €138</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="city-list" id="cityList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="hoe">
+      <div class="section-head">
+        <h2>Wat de AI slim maakt</h2>
+        <p>Niet alleen zoeken naar tickets, maar de hele groepsbeslissing wegen: eerlijkheid, aankomstvensters, prijsrisico en slaapkwaliteit.</p>
+      </div>
+
+      <div class="insights">
+        <article class="insight">
+          <div class="insight-icon">↔</div>
+          <h3>Eerlijke reistijd</h3>
+          <p>De tool straft opties af waarbij één persoon extreem lang onderweg is, ook als de gemiddelde reistijd goed lijkt.</p>
+        </article>
+        <article class="insight">
+          <div class="insight-icon">◷</div>
+          <h3>Slimme aankomst</h3>
+          <p>Resultaten krijgen een hogere score als iedereen ongeveer rond hetzelfde moment kan aankomen.</p>
+        </article>
+        <article class="insight">
+          <div class="insight-icon">€</div>
+          <h3>Totaalprijs</h3>
+          <p>Niet alleen de vlucht, maar ook bagage, trein naar centrum, hotelprijs en beschikbaarheid tellen mee.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-bar" aria-label="Snelle acties">
+    <button class="secondary" type="button" onclick="document.querySelector('#zoek').scrollIntoView({behavior:'smooth'})">Zoek aanpassen</button>
+    <button class="primary" type="button" onclick="document.querySelector('#resultaten').scrollIntoView({behavior:'smooth'})">Resultaten</button>
+  </div>
+
+  <script>
+    const candidateCities = [
+      { name: "Barcelona", travel: 245, hotel: 138, available: true, direct: 3, time: "4u 15m", arrival: "18:20", stayTypes: ["Hotel", "Appartement"], tags: ["strand", "uitgaan", "eten", "shoppen", "warm", "terrassen"], note: "Sterke mix van strand, nachtleven en veel betaalbare accommodaties." },
+      { name: "Valencia", travel: 226, hotel: 104, available: true, direct: 2, time: "4u 40m", arrival: "17:55", stayTypes: ["Hotel", "Appartement", "Hostel"], tags: ["strand", "eten", "betaalbaar", "cultuur", "terrassen"], note: "Goedkoper dan Barcelona, met strand en veel restaurants." },
+      { name: "Lisbon", travel: 258, hotel: 116, available: true, direct: 2, time: "5u 50m", arrival: "19:10", stayTypes: ["Hotel", "Appartement", "Hostel"], tags: ["uitgaan", "eten", "zon", "cultuur", "betaalbaar"], note: "Veel sfeer en goede prijs, maar iets langere reistijd." },
+      { name: "Milan", travel: 196, hotel: 122, available: true, direct: 2, time: "5u 05m", arrival: "17:45", stayTypes: ["Hotel", "Appartement"], tags: ["shoppen", "eten", "cultuur", "design"], note: "Sterk voor shoppen en eten, minder strandgericht." },
+      { name: "Malaga", travel: 284, hotel: 98, available: true, direct: 1, time: "5u 35m", arrival: "20:05", stayTypes: ["Hotel", "Appartement"], tags: ["strand", "zon", "eten", "betaalbaar", "uitgaan"], note: "Heel goed voor zon en strand, vaak gunstige hotelprijzen." },
+      { name: "Prague", travel: 188, hotel: 92, available: true, direct: 2, time: "4u 25m", arrival: "17:30", stayTypes: ["Hotel", "Appartement", "Hostel"], tags: ["uitgaan", "betaalbaar", "cultuur", "eten"], note: "Sterk op budget, horeca en nachtleven." },
+      { name: "Copenhagen", travel: 252, hotel: 172, available: true, direct: 2, time: "4u 35m", arrival: "18:55", stayTypes: ["Hotel", "Appartement"], tags: ["eten", "design", "veilig", "cultuur"], note: "Comfortabel en mooi, maar accommodatie is duurder." },
+      { name: "Dubrovnik", travel: 318, hotel: 186, available: false, direct: 1, time: "6u 10m", arrival: "21:15", stayTypes: ["Hotel", "Appartement"], tags: ["strand", "zon", "cultuur", "eten"], note: "Past goed bij strand, maar valt in deze mock buiten beschikbaar budget/voorraad." }
+    ];
+
+    const destinationCityData = [
+      ["Amsterdam", "Nederland", "AMS", 145, 128, ["eten", "cultuur", "shoppen", "nachtleven", "grachten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Rotterdam", "Nederland", "RTM", 130, 112, ["design", "eten", "architectuur", "uitgaan"], ["Hotel", "Appartement"]],
+      ["Brussels", "Belgie", "BRU", 125, 108, ["eten", "bier", "cultuur", "centraal"], ["Hotel", "Appartement", "Hostel"]],
+      ["Antwerp", "Belgie", "ANR", 118, 104, ["shoppen", "eten", "design", "nachtleven"], ["Hotel", "Appartement"]],
+      ["Paris", "Frankrijk", "CDG", 170, 164, ["cultuur", "eten", "shoppen", "romantisch"], ["Hotel", "Appartement", "Hostel"]],
+      ["Nice", "Frankrijk", "NCE", 205, 142, ["strand", "zon", "eten", "luxe"], ["Hotel", "Appartement"]],
+      ["Lyon", "Frankrijk", "LYS", 158, 116, ["eten", "cultuur", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Bordeaux", "Frankrijk", "BOD", 176, 118, ["wijn", "eten", "cultuur", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Marseille", "Frankrijk", "MRS", 190, 112, ["strand", "zon", "eten", "cultuur"], ["Hotel", "Appartement", "Hostel"]],
+      ["Barcelona", "Spanje", "BCN", 230, 132, ["strand", "uitgaan", "eten", "shoppen", "warm"], ["Hotel", "Appartement", "Hostel"]],
+      ["Valencia", "Spanje", "VLC", 215, 102, ["strand", "eten", "betaalbaar", "cultuur"], ["Hotel", "Appartement", "Hostel"]],
+      ["Madrid", "Spanje", "MAD", 220, 118, ["uitgaan", "eten", "cultuur", "shoppen"], ["Hotel", "Appartement", "Hostel"]],
+      ["Seville", "Spanje", "SVQ", 245, 96, ["zon", "eten", "cultuur", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Malaga", "Spanje", "AGP", 255, 96, ["strand", "zon", "eten", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Bilbao", "Spanje", "BIO", 198, 112, ["eten", "cultuur", "design", "kust"], ["Hotel", "Appartement"]],
+      ["Palma de Mallorca", "Spanje", "PMI", 238, 128, ["strand", "zon", "uitgaan", "eten"], ["Hotel", "Appartement"]],
+      ["Lisbon", "Portugal", "LIS", 250, 112, ["uitgaan", "eten", "zon", "cultuur", "betaalbaar"], ["Hotel", "Appartement", "Hostel"]],
+      ["Porto", "Portugal", "OPO", 222, 92, ["eten", "wijn", "betaalbaar", "cultuur"], ["Hotel", "Appartement", "Hostel"]],
+      ["Faro", "Portugal", "FAO", 260, 104, ["strand", "zon", "rust", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Milan", "Italie", "MXP", 178, 122, ["shoppen", "eten", "cultuur", "design"], ["Hotel", "Appartement"]],
+      ["Rome", "Italie", "FCO", 225, 136, ["cultuur", "eten", "warm", "wandelen"], ["Hotel", "Appartement", "Hostel"]],
+      ["Florence", "Italie", "FLR", 210, 128, ["cultuur", "eten", "romantisch"], ["Hotel", "Appartement"]],
+      ["Venice", "Italie", "VCE", 205, 148, ["romantisch", "cultuur", "eten"], ["Hotel", "Appartement"]],
+      ["Naples", "Italie", "NAP", 240, 98, ["eten", "zon", "cultuur", "betaalbaar"], ["Hotel", "Appartement", "Hostel"]],
+      ["Bologna", "Italie", "BLQ", 188, 104, ["eten", "cultuur", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Vienna", "Oostenrijk", "VIE", 172, 118, ["cultuur", "eten", "kerstmarkt", "comfort"], ["Hotel", "Appartement", "Hostel"]],
+      ["Salzburg", "Oostenrijk", "SZG", 188, 126, ["bergen", "cultuur", "rust"], ["Hotel", "Appartement"]],
+      ["Zurich", "Zwitserland", "ZRH", 160, 178, ["eten", "meer", "veilig", "luxe"], ["Hotel", "Appartement"]],
+      ["Geneva", "Zwitserland", "GVA", 168, 166, ["meer", "eten", "luxe", "cultuur"], ["Hotel", "Appartement"]],
+      ["Basel", "Zwitserland", "BSL", 150, 142, ["cultuur", "eten", "centraal"], ["Hotel", "Appartement"]],
+      ["Berlin", "Duitsland", "BER", 160, 102, ["uitgaan", "cultuur", "betaalbaar", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Hamburg", "Duitsland", "HAM", 150, 108, ["uitgaan", "water", "eten", "shoppen"], ["Hotel", "Appartement", "Hostel"]],
+      ["Munich", "Duitsland", "MUC", 165, 128, ["bier", "eten", "cultuur", "bergen"], ["Hotel", "Appartement"]],
+      ["Cologne", "Duitsland", "CGN", 135, 98, ["uitgaan", "eten", "betaalbaar", "kerstmarkt"], ["Hotel", "Appartement", "Hostel"]],
+      ["Frankfurt", "Duitsland", "FRA", 140, 104, ["centraal", "eten", "shoppen"], ["Hotel", "Appartement"]],
+      ["Prague", "Tsjechie", "PRG", 170, 88, ["uitgaan", "betaalbaar", "cultuur", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Budapest", "Hongarije", "BUD", 190, 82, ["uitgaan", "spa", "betaalbaar", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Krakow", "Polen", "KRK", 185, 78, ["uitgaan", "cultuur", "betaalbaar", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Warsaw", "Polen", "WAW", 176, 84, ["cultuur", "eten", "betaalbaar", "nachtleven"], ["Hotel", "Appartement", "Hostel"]],
+      ["Gdansk", "Polen", "GDN", 188, 82, ["water", "strand", "betaalbaar", "eten"], ["Hotel", "Appartement"]],
+      ["Copenhagen", "Denemarken", "CPH", 205, 162, ["eten", "design", "veilig", "cultuur"], ["Hotel", "Appartement"]],
+      ["Stockholm", "Zweden", "ARN", 230, 152, ["water", "design", "veilig", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Gothenburg", "Zweden", "GOT", 210, 132, ["eten", "water", "relaxed"], ["Hotel", "Appartement"]],
+      ["Oslo", "Noorwegen", "OSL", 225, 166, ["natuur", "water", "veilig", "design"], ["Hotel", "Appartement"]],
+      ["Bergen", "Noorwegen", "BGO", 260, 154, ["natuur", "bergen", "water", "rust"], ["Hotel", "Appartement"]],
+      ["Helsinki", "Finland", "HEL", 245, 132, ["design", "sauna", "water", "veilig"], ["Hotel", "Appartement"]],
+      ["Tallinn", "Estland", "TLL", 230, 86, ["cultuur", "betaalbaar", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Riga", "Letland", "RIX", 218, 78, ["uitgaan", "betaalbaar", "cultuur"], ["Hotel", "Appartement", "Hostel"]],
+      ["Vilnius", "Litouwen", "VNO", 220, 74, ["betaalbaar", "cultuur", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["London", "Verenigd Koninkrijk", "LHR", 185, 172, ["shoppen", "uitgaan", "cultuur", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Manchester", "Verenigd Koninkrijk", "MAN", 190, 112, ["uitgaan", "muziek", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Edinburgh", "Verenigd Koninkrijk", "EDI", 220, 138, ["cultuur", "pubs", "wandelen"], ["Hotel", "Appartement", "Hostel"]],
+      ["Dublin", "Ierland", "DUB", 210, 148, ["pubs", "uitgaan", "cultuur", "eten"], ["Hotel", "Appartement", "Hostel"]],
+      ["Athens", "Griekenland", "ATH", 280, 96, ["zon", "cultuur", "eten", "betaalbaar"], ["Hotel", "Appartement", "Hostel"]],
+      ["Thessaloniki", "Griekenland", "SKG", 270, 82, ["strand", "eten", "uitgaan", "betaalbaar"], ["Hotel", "Appartement"]],
+      ["Istanbul", "Turkije", "IST", 295, 88, ["eten", "cultuur", "shoppen", "betaalbaar"], ["Hotel", "Appartement", "Hostel"]],
+      ["Dubrovnik", "Kroatie", "DBV", 285, 154, ["strand", "zon", "cultuur", "eten"], ["Hotel", "Appartement"]],
+      ["Split", "Kroatie", "SPU", 265, 124, ["strand", "zon", "uitgaan", "eten"], ["Hotel", "Appartement"]],
+      ["Zagreb", "Kroatie", "ZAG", 195, 82, ["cultuur", "eten", "betaalbaar"], ["Hotel", "Appartement", "Hostel"]],
+      ["Ljubljana", "Slovenie", "LJU", 190, 96, ["eten", "natuur", "betaalbaar", "rust"], ["Hotel", "Appartement"]],
+      ["Reykjavik", "IJsland", "KEF", 330, 176, ["natuur", "avontuur", "rust"], ["Hotel", "Appartement"]],
+      ["Valletta", "Malta", "MLA", 285, 118, ["zon", "strand", "cultuur", "eten"], ["Hotel", "Appartement"]]
+    ];
+
+    const airportAlternatives = {
+      AMS: ["AMS", "RTM", "EIN"], RTM: ["RTM", "AMS", "EIN"], EIN: ["EIN", "AMS", "BRU", "DUS"],
+      ZRH: ["ZRH", "BSL", "GVA"], BSL: ["BSL", "ZRH"], GVA: ["GVA", "ZRH"],
+      LHR: ["LHR", "LGW", "STN", "LCY"], LGW: ["LGW", "LHR", "STN"], CDG: ["CDG", "ORY", "BVA"],
+      BRU: ["BRU", "CRL", "ANR"], BER: ["BER"], MUC: ["MUC"], FRA: ["FRA", "HHN"], BCN: ["BCN", "GRO", "REU"],
+      MXP: ["MXP", "LIN", "BGY"], FCO: ["FCO", "CIA"], OSL: ["OSL", "TRF"], ARN: ["ARN", "BMA", "NYO"]
+    };
+
+    const destinationCities = destinationCityData.map(([name, country, code, travel, hotel, tags, stayTypes], index) => ({
+      name, country, travel, hotel, tags, stayTypes,
+      available: true,
+      airportCodes: airportAlternatives[code] || [code],
+      direct: Math.max(1, 4 - (index % 4)),
+      time: `${Math.floor((travel + 65) / 60)}u ${String((travel + 65) % 60).padStart(2, "0")}m`,
+      arrival: "volgens tijdvenster",
+      note: `Past vooral bij: ${tags.slice(0, 4).join(", ")}.`,
+      scoreWeights: { wishes: 45, budget: 22, stay: 14, route: 14, diversity: 5 }
+    }));
+    const cities = [
+      { name: "Barcelona", score: 86, route: "Directe vluchten + goede treinen naar centrum", time: "4u 15m", price: 312, hotel: "€138", changes: "0-1", arrival: "18:20" },
+      { name: "Milaan", score: 81, route: "Sterke treinopties en betaalbare hotels", time: "5u 05m", price: 286, hotel: "€122", changes: "1", arrival: "17:45" },
+      { name: "Lissabon", score: 78, route: "Iets langer reizen, maar goede weekendwaarde", time: "5u 50m", price: 344, hotel: "€116", changes: "0-1", arrival: "19:10" },
+      { name: "Kopenhagen", score: 73, route: "Erg comfortabel, maar hotels drukken de score", time: "4u 35m", price: 398, hotel: "€172", changes: "0-1", arrival: "18:55" }
+    ];
+
+    const fallbackMajorCities = [
+      ["Amsterdam", "Nederland"], ["Rotterdam", "Nederland"], ["Den Haag", "Nederland"], ["Utrecht", "Nederland"], ["Eindhoven", "Nederland"], ["Groningen", "Nederland"], ["Maastricht", "Nederland"],
+      ["Brussel", "België"], ["Antwerpen", "België"], ["Gent", "België"], ["Brugge", "België"], ["Luik", "België"],
+      ["Zürich", "Zwitserland"], ["Genève", "Zwitserland"], ["Basel", "Zwitserland"], ["Bern", "Zwitserland"], ["Lausanne", "Zwitserland"], ["Lugano", "Zwitserland"],
+      ["Berlin", "Duitsland"], ["Hamburg", "Duitsland"], ["München", "Duitsland"], ["Köln", "Duitsland"], ["Frankfurt", "Duitsland"], ["Düsseldorf", "Duitsland"], ["Stuttgart", "Duitsland"], ["Dortmund", "Duitsland"], ["Leipzig", "Duitsland"], ["Hannover", "Duitsland"], ["Nürnberg", "Duitsland"], ["Bremen", "Duitsland"],
+      ["Paris", "Frankrijk"], ["Lyon", "Frankrijk"], ["Marseille", "Frankrijk"], ["Nice", "Frankrijk"], ["Toulouse", "Frankrijk"], ["Bordeaux", "Frankrijk"], ["Lille", "Frankrijk"], ["Nantes", "Frankrijk"], ["Strasbourg", "Frankrijk"], ["Montpellier", "Frankrijk"],
+      ["London", "Verenigd Koninkrijk"], ["Manchester", "Verenigd Koninkrijk"], ["Birmingham", "Verenigd Koninkrijk"], ["Liverpool", "Verenigd Koninkrijk"], ["Edinburgh", "Verenigd Koninkrijk"], ["Glasgow", "Verenigd Koninkrijk"], ["Bristol", "Verenigd Koninkrijk"], ["Leeds", "Verenigd Koninkrijk"],
+      ["Dublin", "Ierland"], ["Cork", "Ierland"], ["Belfast", "Verenigd Koninkrijk"],
+      ["Madrid", "Spanje"], ["Barcelona", "Spanje"], ["Valencia", "Spanje"], ["Sevilla", "Spanje"], ["Bilbao", "Spanje"], ["Málaga", "Spanje"], ["Alicante", "Spanje"], ["Palma de Mallorca", "Spanje"],
+      ["Lisbon", "Portugal"], ["Porto", "Portugal"], ["Faro", "Portugal"],
+      ["Rome", "Italië"], ["Milan", "Italië"], ["Venice", "Italië"], ["Florence", "Italië"], ["Naples", "Italië"], ["Bologna", "Italië"], ["Turin", "Italië"], ["Palermo", "Italië"], ["Catania", "Italië"],
+      ["Vienna", "Oostenrijk"], ["Salzburg", "Oostenrijk"], ["Innsbruck", "Oostenrijk"], ["Graz", "Oostenrijk"],
+      ["Copenhagen", "Denemarken"], ["Aarhus", "Denemarken"], ["Stockholm", "Zweden"], ["Gothenburg", "Zweden"], ["Malmö", "Zweden"], ["Oslo", "Noorwegen"], ["Bergen", "Noorwegen"], ["Helsinki", "Finland"], ["Tampere", "Finland"], ["Reykjavik", "IJsland"],
+      ["Warsaw", "Polen"], ["Kraków", "Polen"], ["Gdańsk", "Polen"], ["Wrocław", "Polen"], ["Poznań", "Polen"],
+      ["Prague", "Tsjechië"], ["Brno", "Tsjechië"], ["Budapest", "Hongarije"], ["Debrecen", "Hongarije"], ["Bratislava", "Slowakije"],
+      ["Ljubljana", "Slovenië"], ["Zagreb", "Kroatië"], ["Split", "Kroatië"], ["Dubrovnik", "Kroatië"], ["Belgrade", "Servië"], ["Sarajevo", "Bosnië en Herzegovina"],
+      ["Athens", "Griekenland"], ["Thessaloniki", "Griekenland"], ["Istanbul", "Turkije"], ["Ankara", "Turkije"], ["Izmir", "Turkije"], ["Antalya", "Turkije"],
+      ["Bucharest", "Roemenië"], ["Sofia", "Bulgarije"], ["Riga", "Letland"], ["Tallinn", "Estland"], ["Vilnius", "Litouwen"],
+      ["New York", "Verenigde Staten"], ["Los Angeles", "Verenigde Staten"], ["Chicago", "Verenigde Staten"], ["San Francisco", "Verenigde Staten"], ["Miami", "Verenigde Staten"], ["Boston", "Verenigde Staten"], ["Washington DC", "Verenigde Staten"], ["Seattle", "Verenigde Staten"], ["Las Vegas", "Verenigde Staten"],
+      ["Toronto", "Canada"], ["Vancouver", "Canada"], ["Montreal", "Canada"], ["Calgary", "Canada"],
+      ["Mexico City", "Mexico"], ["Cancún", "Mexico"], ["Guadalajara", "Mexico"], ["São Paulo", "Brazilië"], ["Rio de Janeiro", "Brazilië"], ["Buenos Aires", "Argentinië"], ["Santiago", "Chili"], ["Lima", "Peru"], ["Bogotá", "Colombia"],
+      ["Dubai", "Verenigde Arabische Emiraten"], ["Abu Dhabi", "Verenigde Arabische Emiraten"], ["Doha", "Qatar"], ["Tel Aviv", "Israël"], ["Cairo", "Egypte"], ["Marrakesh", "Marokko"], ["Casablanca", "Marokko"], ["Cape Town", "Zuid-Afrika"], ["Johannesburg", "Zuid-Afrika"],
+      ["Tokyo", "Japan"], ["Osaka", "Japan"], ["Kyoto", "Japan"], ["Seoul", "Zuid-Korea"], ["Singapore", "Singapore"], ["Bangkok", "Thailand"], ["Kuala Lumpur", "Maleisië"], ["Hong Kong", "Hongkong"], ["Shanghai", "China"], ["Beijing", "China"], ["Taipei", "Taiwan"], ["Mumbai", "India"], ["Delhi", "India"], ["Bengaluru", "India"],
+      ["Sydney", "Australië"], ["Melbourne", "Australië"], ["Brisbane", "Australië"], ["Auckland", "Nieuw-Zeeland"]
+    ].map(([city, country]) => ({ city, country }));
+    const majorCities = window.meetwayEuropeCities?.length ? window.meetwayEuropeCities : fallbackMajorCities;
+
+    const cityList = document.querySelector("#cityList");
+    const budget = document.querySelector("#budget");
+    const budgetValue = document.querySelector("#budgetValue");
+    let activeSort = "match";
+    const tripBudget = document.querySelector("#tripBudget");
+    const tripBudgetValue = document.querySelector("#tripBudgetValue");
+    const comfort = document.querySelector("#comfort");
+    const comfortValue = document.querySelector("#comfortValue");
+    const tripSummary = document.querySelector("#tripSummary");
+    const serverWarning = document.querySelector("#serverWarning");
+    const liveApiStatus = document.querySelector("#liveApiStatus");
+    const liveFlightsByDestination = new Map();
+    const popularCities = ["Amsterdam", "Zürich", "London", "Paris", "Barcelona", "Berlin"].map((city) => majorCities.find((item) => item.city === city)).filter(Boolean);
+
+    const i18n = {
+      nl: {
+        title: "Alpaica - beste ontmoetingsplek vinden",
+        heroTitle: "Dit is de leukste plek om elkaar te ontmoeten.",
+        navSearch: "Zoeken", navResults: "Resultaten", navHow: "Hoe het werkt",
+        stepPeople: "Wie reist mee?", stepFlight: "Wanneer en hoe vliegen?", stepStay: "Waar willen jullie slapen?", stepBudget: "Budget en sfeer",
+        name: "Naam", homeCity: "Woonplaats", addTraveler: "+ Reiziger toevoegen",
+        arrivalDate: "Aankomstdag", returnDate: "Terugreisdag", outFrom: "Heen vanaf", outTo: "Heen tot", backFrom: "Terug vanaf", backTo: "Terug tot",
+        directOnly: "Alleen directe vluchten", noEarly: "Geen heel vroege vluchten",
+        anyStay: "Maakt niet uit", hotel: "Hotel", apartment: "Appartement", hostel: "Hostel",
+        luxury: "Luxegrad", roomType: "Kamerindeling", budget: "Maximaal budget per persoon", comfort: "Hoe belangrijk is accommodatiekwaliteit?", wishes: "Wat moet de locatie hebben?",
+        luxuryOptions: ["Gewoon goed", "3 sterren of hoger", "4 sterren of hoger", "Zo luxe mogelijk"],
+        roomOptions: ["Maakt niet uit", "Iedereen eigen kamer", "Twee eenpersoonsbedden", "Tweepersoonskamers", "Meerdere kamers"],
+        mixOptions: ["Vlucht + trein + auto", "Alleen trein", "Alleen vlucht", "Geen nachtvluchten"],
+        searchButton: "Beste plekken zoeken", bestMatch: "Beste match", lowestPrice: "Laagste prijs",
+        resultsTitle: "Resultaten", resultsIntro: "De beste match staat bovenaan. Klik op vluchten of accommodatie voor details.",
+        travelers: "reizigers", from: "Vertrek vanuit", liveLoading: "Echte vluchtprijzen ophalen via SerpApi...", liveLoaded: "Live vluchtprijzen geladen via", localFallback: "De lokale MVP-schatting blijft zichtbaar. Open de website via http://localhost:4180 als je nu nog file:// gebruikt."
+      },
+      de: {
+        title: "Alpaica - den besten Treffpunkt finden",
+        heroTitle: "Das ist der schönste Ort, um sich zu treffen.",
+        navSearch: "Suchen", navResults: "Ergebnisse", navHow: "So funktioniert es",
+        stepPeople: "Wer reist mit?", stepFlight: "Wann und wie fliegen?", stepStay: "Wo wollt ihr schlafen?", stepBudget: "Budget und Stimmung",
+        name: "Name", homeCity: "Wohnort", addTraveler: "+ Reisende hinzufügen",
+        arrivalDate: "Anreisetag", returnDate: "Rückreisetag", outFrom: "Hinflug ab", outTo: "Hinflug bis", backFrom: "Rückflug ab", backTo: "Rückflug bis",
+        directOnly: "Nur Direktflüge", noEarly: "Keine sehr frühen Flüge",
+        anyStay: "Egal", hotel: "Hotel", apartment: "Apartment", hostel: "Hostel",
+        luxury: "Komfortniveau", roomType: "Zimmeraufteilung", budget: "Maximales Budget pro Person", comfort: "Wie wichtig ist die Unterkunftsqualität?", wishes: "Was soll der Ort bieten?",
+        luxuryOptions: ["Einfach gut", "3 Sterne oder höher", "4 Sterne oder höher", "So komfortabel wie möglich"],
+        roomOptions: ["Egal", "Alle ein eigenes Zimmer", "Zwei Einzelbetten", "Doppelzimmer", "Mehrere Zimmer"],
+        mixOptions: ["Flug + Zug + Auto", "Nur Zug", "Nur Flug", "Keine Nachtflüge"],
+        searchButton: "Beste Orte suchen", bestMatch: "Beste Übereinstimmung", lowestPrice: "Niedrigster Preis",
+        resultsTitle: "Ergebnisse", resultsIntro: "Die beste Übereinstimmung steht oben. Tippe auf Flüge oder Unterkunft für Details.",
+        travelers: "Reisende", from: "Abreise aus", liveLoading: "Echte Flugpreise werden über SerpApi geladen...", liveLoaded: "Live-Flugpreise geladen über", localFallback: "Die lokale MVP-Schätzung bleibt sichtbar. Öffne die Website über http://localhost:4180, falls du noch file:// nutzt."
+      },
+      en: {
+        title: "Alpaica - find the best place to meet",
+        heroTitle: "This is the most fun place to meet.",
+        navSearch: "Search", navResults: "Results", navHow: "How it works",
+        stepPeople: "Who is travelling?", stepFlight: "When and how to fly?", stepStay: "Where do you want to stay?", stepBudget: "Budget and vibe",
+        name: "Name", homeCity: "Home city", addTraveler: "+ Add traveller",
+        arrivalDate: "Arrival day", returnDate: "Return day", outFrom: "Outbound from", outTo: "Outbound until", backFrom: "Return from", backTo: "Return until",
+        directOnly: "Direct flights only", noEarly: "No very early flights",
+        anyStay: "Any", hotel: "Hotel", apartment: "Apartment", hostel: "Hostel",
+        luxury: "Comfort level", roomType: "Room setup", budget: "Maximum budget per person", comfort: "How important is accommodation quality?", wishes: "What should the place offer?",
+        luxuryOptions: ["Good enough", "3 stars or higher", "4 stars or higher", "As comfortable as possible"],
+        roomOptions: ["Any", "Everyone their own room", "Two single beds", "Double rooms", "Multiple rooms"],
+        mixOptions: ["Flight + train + car", "Train only", "Flight only", "No night flights"],
+        searchButton: "Find best places", bestMatch: "Best match", lowestPrice: "Lowest price",
+        resultsTitle: "Results", resultsIntro: "The best match is shown first. Tap flights or accommodation for details.",
+        travelers: "travellers", from: "Leaving from", liveLoading: "Loading real flight prices via SerpApi...", liveLoaded: "Live flight prices loaded via", localFallback: "The local MVP estimate remains visible. Open the website via http://localhost:4180 if you are still using file://."
+      }
+    };
+    let activeLocale = detectLocale();
+
+    function tr(key) {
+      return (i18n[activeLocale] || i18n.en)[key] || i18n.en[key] || key;
+    }
+
+    function detectLocale() {
+      const urlLocale = new URLSearchParams(window.location.search).get("lang");
+      if (i18n[urlLocale]) return urlLocale;
+      const savedLocale = localStorage.getItem("alpaicaLocale");
+      if (localStorage.getItem("alpaicaLocaleManual") === "true" && i18n[savedLocale]) return savedLocale;
+      const language = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      if (timezone === "Europe/Zurich" || /^de/.test(language) || /-ch$/.test(language)) return "de";
+      if (timezone === "Europe/Amsterdam" || /^nl/.test(language)) return "nl";
+      return "en";
+    }
+
+    function setLabelText(label, text) {
+      if (!label) return;
+      const textNode = [...label.childNodes].find((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+      if (textNode) textNode.textContent = `${text}\n                `;
+    }
+
+    function setChipText(selector, text) {
+      const target = document.querySelector(selector);
+      const label = target?.closest?.("label") || target;
+      if (!label) return;
+      const textNode = [...label.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+      if (textNode) textNode.textContent = ` ${text}`;
+    }
+
+    function updatePersonLabels() {
+      document.querySelectorAll("#people .person").forEach((row) => {
+        const labels = row.querySelectorAll("label");
+        setLabelText(labels[0], tr("name"));
+        setLabelText(labels[1], tr("homeCity"));
+      });
+    }
+
+    function translateSelectOptions(select, labels) {
+      if (!select || !labels) return;
+      [...select.options].forEach((option, index) => {
+        if (labels[index]) option.textContent = labels[index];
+      });
+    }
+
+    function applyLocale() {
+      document.documentElement.lang = activeLocale;
+      document.title = tr("title");
+      document.querySelector("[data-i18n='heroTitle']").textContent = tr("heroTitle");
+      const navLinks = document.querySelectorAll(".nav a");
+      if (navLinks[0]) navLinks[0].textContent = tr("navSearch");
+      if (navLinks[1]) navLinks[1].textContent = tr("navResults");
+      if (navLinks[2]) navLinks[2].textContent = tr("navHow");
+      document.querySelector("#step-people").innerHTML = `<span><span class="step-number">1</span> ${tr("stepPeople")}</span>`;
+      document.querySelector("#step-flight").innerHTML = `<span><span class="step-number">2</span> ${tr("stepFlight")}</span>`;
+      document.querySelector("#step-stay").innerHTML = `<span><span class="step-number">3</span> ${tr("stepStay")}</span>`;
+      document.querySelector("#step-budget").innerHTML = `<span><span class="step-number">4</span> ${tr("stepBudget")}</span>`;
+      updatePersonLabels();
+      document.querySelector("#addPerson").textContent = tr("addTraveler");
+      setLabelText(document.querySelector("#arrivalDate")?.closest("label"), tr("arrivalDate"));
+      setLabelText(document.querySelector("#returnDate")?.closest("label"), tr("returnDate"));
+      if (document.querySelector("#outboundWindowTitle")) document.querySelector("#outboundWindowTitle").textContent = tr("outFrom").replace(" vanaf", "").replace(" ab", "").replace(" from", "");
+      if (document.querySelector("#returnWindowTitle")) document.querySelector("#returnWindowTitle").textContent = tr("backFrom").replace(" vanaf", "").replace(" ab", "").replace(" from", "");
+      setChipText("#directOnly", tr("directOnly"));
+      setChipText(".toggle-row label:nth-child(2)", tr("noEarly"));
+      setChipText("input[value='Maakt niet uit']", tr("anyStay"));
+      setChipText("input[value='Hotel']", tr("hotel"));
+      setChipText("input[value='Appartement']", tr("apartment"));
+      setChipText("input[value='Hostel']", tr("hostel"));
+      setLabelText(document.querySelector("#luxury")?.closest("label"), tr("luxury"));
+      setLabelText(document.querySelector("#roomType")?.closest("label"), tr("roomType"));
+      translateSelectOptions(document.querySelector("#luxury"), tr("luxuryOptions"));
+      translateSelectOptions(document.querySelector("#roomType"), tr("roomOptions"));
+      translateSelectOptions(document.querySelector(".filters select:last-of-type"), tr("mixOptions"));
+      document.querySelector("#tripBudgetValue").previousElementSibling.textContent = tr("budget");
+      document.querySelector("#comfortValue").previousElementSibling.textContent = tr("comfort");
+      setLabelText(document.querySelector("#wishText")?.closest("label"), tr("wishes"));
+      document.querySelector("#searchButton").textContent = tr("searchButton");
+      document.querySelector("[data-sort='match']").textContent = tr("bestMatch");
+      document.querySelector("[data-sort='price']").textContent = tr("lowestPrice");
+      const resultHead = document.querySelector("#resultaten .section-head");
+      resultHead.querySelector("h2").textContent = tr("resultsTitle");
+      resultHead.querySelector("p").textContent = tr("resultsIntro");
+      if (location.protocol === "file:") {
+        serverWarning.hidden = false;
+        serverWarning.innerHTML = activeLocale === "de"
+          ? 'Live-Flüge funktionieren nur über <strong>http://localhost:4180/index.html</strong>, nicht über diese file:// Ansicht.'
+          : activeLocale === "en"
+            ? 'Live flights only work via <strong>http://localhost:4180/index.html</strong>, not from this file:// view.'
+            : 'Live vluchten werken alleen via <strong>http://localhost:4180/index.html</strong>, niet via deze file:// weergave.';
+      } else {
+        serverWarning.hidden = true;
+      }
+      document.querySelectorAll("[data-lang]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.lang === activeLocale);
+      });
+    }
+
+    const airportByCity = {
+      amsterdam: "AMS",
+      rotterdam: "RTM",
+      "den haag": "RTM",
+      utrecht: "AMS",
+      eindhoven: "EIN",
+      borne: "AMS",
+      enschede: "AMS",
+      london: "LHR",
+      zurich: "ZRH",
+      paris: "CDG",
+      brussel: "BRU",
+      brussels: "BRU",
+      berlin: "BER",
+      barcelona: "BCN",
+      valencia: "VLC",
+      lisbon: "LIS",
+      milan: "MXP",
+      malaga: "AGP",
+      prague: "PRG",
+      copenhagen: "CPH"
+    };
+    const destinationAirport = { Barcelona: "BCN", Valencia: "VLC", Lisbon: "LIS", Milan: "MXP", Malaga: "AGP", Prague: "PRG", Copenhagen: "CPH", Dubrovnik: "DBV" };
+    const airlines = ["KLM", "Vueling", "easyJet", "Swiss", "Lufthansa", "Transavia"];
+
+    function normalizeCity(value) {
+      return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function minutesToTime(value) {
+      const total = Number(value);
+      const hours = String(Math.floor(total / 60)).padStart(2, "0");
+      const minutes = String(total % 60).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    }
+
+    function clampMinutes(value) {
+      return Math.max(0, Math.min(1430, value));
+    }
+
+    function cityAirport(city) {
+      return airportByCity[normalizeCity(city)] || city.slice(0, 3).toUpperCase();
+    }
+
+    function estimateFlight(city, traveler, index) {
+      const origin = cityAirport(traveler.city);
+      const destination = destinationAirport[city.name] || city.name.slice(0, 3).toUpperCase();
+      const outStart = Number(document.querySelector("#outFrom").value);
+      const outEnd = Number(document.querySelector("#outTo").value);
+      const backStart = Number(document.querySelector("#backFrom").value);
+      const backEnd = Number(document.querySelector("#backTo").value);
+      const outWindow = Math.max(30, outEnd - outStart);
+      const backWindow = Math.max(30, backEnd - backStart);
+      const seed = normalizeCity(`${origin}-${destination}-${traveler.name}`).split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const outDeparture = clampMinutes(outStart + ((seed + index * 45) % outWindow));
+      const backDeparture = clampMinutes(backStart + ((seed + index * 55) % backWindow));
+      const duration = 105 + ((seed + city.name.length * 19) % 210);
+      const price = Math.round(city.travel * (0.82 + ((seed % 37) / 100)) + index * 11);
+      return {
+        traveler: traveler.name,
+        origin,
+        destination,
+        airline: airlines[seed % airlines.length],
+        outbound: `${minutesToTime(outDeparture)}-${minutesToTime(clampMinutes(outDeparture + duration))}`,
+        inbound: `${minutesToTime(backDeparture)}-${minutesToTime(clampMinutes(backDeparture + duration))}`,
+        price
+      };
+    }
+
+    function flightBreakdown(city) {
+      return liveFlightsByDestination.get(city.name) || [];
+    }
+
+    function accommodationOptions(city) {
+      const requested = selectedStayType();
+      const baseType = requested === "Maakt niet uit" ? (city.stayTypes[0] || "Hotel") : requested;
+      const names = {
+        Barcelona: ["Hotel Brisa Nova", "Eixample Apartment", "Casa Mar Rooms"],
+        Valencia: ["Jardin Turia Stay", "Ruzafa Loft", "Sol Beach Hotel"],
+        Lisbon: ["Alfama View Hotel", "Baixa Apartment", "Tejo House"],
+        Milan: ["Navigli Design Hotel", "Brera Rooms", "Porta Nuova Flat"],
+        Malaga: ["Malagueta Beach Stay", "Centro Patio Hotel", "Soho Apartment"],
+        Prague: ["Old Town Rooms", "Vltava Boutique", "Karlin Apartment"],
+        Copenhagen: ["Nyhavn Urban Hotel", "Vesterbro Studio", "Harbor Sleep"],
+        Dubrovnik: ["Old Port Hotel", "Lapad Apartment", "City Wall Rooms"]
+      };
+      const labels = names[city.name] || [`${city.name} Central Stay`, `${city.name} Apartment`, `${city.name} Rooms`];
+      return labels.map((name, index) => ({
+        name,
+        type: index === 1 ? "Appartement" : baseType,
+        price: Math.max(58, city.hotel + index * 24 - (index === 0 ? 0 : 8)),
+        rating: (4.7 - index * 0.25).toFixed(1),
+        fit: index === 0 ? "Beste match" : index === 1 ? "Meer ruimte" : "Goedkoop alternatief",
+        room: index === 1 ? "Appartement met 2 slaapkamers" : index === 2 ? "Compacte kamers" : "Tweepersoonskamers beschikbaar",
+        reason: index === 0
+          ? "Past het beste bij jullie budget, locatievoorkeur en comfortscore."
+          : index === 1
+            ? "Handig als jullie samen willen zitten en meer leefruimte willen."
+            : "Interessant als prijs belangrijker is dan luxe."
+      }));
+    }
+
+    function stayThumbnail(city, index) {
+      const palettes = [
+        ["#f5b84b", "#087f8c", "#fff8df"],
+        ["#7fb7be", "#172126", "#f4f8f8"],
+        ["#e85d4f", "#f5b84b", "#ffffff"]
+      ];
+      const [a, b, c] = palettes[index % palettes.length];
+      const encoded = encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 118">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="${a}"/>
+              <stop offset="1" stop-color="${b}"/>
+            </linearGradient>
+          </defs>
+          <rect width="140" height="118" fill="url(#g)"/>
+          <circle cx="112" cy="24" r="18" fill="${c}" opacity=".92"/>
+          <path d="M0 86 32 58l20 18 28-32 60 56v18H0Z" fill="${c}" opacity=".78"/>
+          <rect x="22" y="28" width="42" height="34" rx="6" fill="#fff" opacity=".36"/>
+          <rect x="74" y="34" width="36" height="22" rx="5" fill="#fff" opacity=".28"/>
+          <text x="12" y="108" font-family="Arial" font-size="13" font-weight="700" fill="#fff">${city.name}</text>
+        </svg>
+      `);
+      return `data:image/svg+xml,${encoded}`;
+    }
+
+    function renderAccommodationOptions(city) {
+      return `
+        <div class="stay-breakdown">
+          <h4>Accommodatie</h4>
+          ${accommodationOptions(city).slice(0, 3).map((stay, index) => `
+            <details class="click-detail stay-option" ${index === 0 ? "open" : ""}>
+              <summary>
+                <span>${stay.fit}: ${stay.name}</span>
+                <span>€${stay.price} p.p.</span>
+              </summary>
+              <div class="detail-body">
+                <div class="stay-content">
+                  <img class="stay-thumb" src="${stayThumbnail(city, index)}" alt="${stay.name}">
+                  <div>
+                    <span class="provider-pill">${index === 0 ? "Beste match" : "Alternatief"}</span>
+                    <div class="detail-row"><b>Type</b><span>${stay.type}</span></div>
+                    <div class="detail-row"><b>Rating</b><span>${stay.rating}/5 indicatief</span></div>
+                    <div class="detail-row"><b>Kamer</b><span>${stay.room}</span></div>
+                    <div class="detail-row"><b>Waarom</b><span>${stay.reason}</span></div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderFlightOptions(city) {
+      if (!city.flights.length) {
+        return `
+          <div class="flight-breakdown">
+            <h4>Live flights</h4>
+            <div class="empty-state">
+              Geen nepvluchten zichtbaar. Open Alpaica via <strong>http://localhost:4180</strong> en klik op zoeken; echte Google Flights-resultaten verschijnen hier zodra SerpApi bereikbaar is.
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="flight-breakdown">
+          <h4>Vluchten per reiziger</h4>
+          ${city.flights.map((flight, index) => `
+            <details class="click-detail traveler-flight" ${index === 0 ? "open" : ""}>
+              <summary>
+                <span>${flight.traveler}: ${flight.origin} → ${flight.destination}</span>
+                <span>€${flight.price || "?"}</span>
+              </summary>
+              <div class="detail-body">
+                <span class="provider-pill">${flight.source || "MVP vluchtdata"}</span>
+                <div class="detail-row"><b>Heen</b><span>${flight.outbound || "Tijd niet bekend"}</span></div>
+                <div class="detail-row"><b>Terug</b><span>${flight.inbound || "Tijd niet bekend"}</span></div>
+                <div class="detail-row"><b>Airline</b><span>${flight.airline || "Nog niet bekend"}</span></div>
+                <div class="detail-row"><b>Route</b><span>${flight.origin} naar ${flight.destination}</span></div>
+                <div class="detail-row"><b>Overstappen</b><span>${flight.stops === 0 ? "Direct" : `${flight.stops || 0} overstap${flight.stops > 1 ? "pen" : ""}`}</span></div>
+                <div class="detail-row"><b>Prijs</b><span>€${flight.price || "?"} vlucht p.p.</span></div>
+                ${(flight.segments || []).map((segment) => `
+                  <div class="detail-row"><b>Segment</b><span>${segment.departureAirport || flight.origin} ${segment.departureTime || ""} → ${segment.arrivalAirport || flight.destination} ${segment.arrivalTime || ""}${segment.flightNumber ? ` · ${segment.flightNumber}` : ""}</span></div>
+                `).join("")}
+              </div>
+            </details>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function updateTimeLabels() {
+      ["outFrom", "outTo", "backFrom", "backTo"].forEach((id) => {
+        document.querySelector(`#${id}Label`).textContent = minutesToTime(document.querySelector(`#${id}`).value);
+      });
+    }
+
+    function syncTripDates() {
+      const arrival = document.querySelector("#arrivalDate");
+      const returnDate = document.querySelector("#returnDate");
+      const today = new Date().toISOString().slice(0, 10);
+      arrival.min = today;
+      returnDate.min = arrival.value || today;
+      if (returnDate.value && returnDate.value < returnDate.min) returnDate.value = returnDate.min;
+    }
+
+    function scoreCity(city) {
+      const wishes = normalizeCity(document.querySelector("#wishText").value);
+      const requested = selectedStayType();
+      const hasStayType = requested === "Maakt niet uit" || city.stayTypes.includes(requested);
+      const tagHits = city.tags.filter((tag) => wishes.includes(normalizeCity(tag))).length;
+      const wishScore = wishes ? Math.min(45, tagHits * 16) : 28;
+      const budgetScore = city.travel + city.hotel <= Number(tripBudget.value) ? 25 : 0;
+      const stayScore = city.available && hasStayType ? 20 : 0;
+      const directScore = document.querySelector("#directOnly").checked ? Math.min(10, city.direct * 4) : 8;
+      return Math.min(100, wishScore + budgetScore + stayScore + directScore);
+    }
+
+    function liveDestinations() {
+      const requested = selectedStayType();
+      return candidateCities
+        .map((city) => ({ ...city, score: scoreCity(city), stayOk: requested === "Maakt niet uit" || city.stayTypes.includes(requested) }))
+        .filter((city) => city.available && city.stayOk)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map((city) => city.name);
+    }
+
+    async function loadLiveGroupFlights() {
+      liveApiStatus.hidden = false;
+      liveApiStatus.textContent = tr("liveLoading");
+
+      try {
+        const response = await fetch("/api/group-flights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            travelers: collectTravelers(),
+            destinations: liveDestinations(),
+            departureDate: document.querySelector("#arrivalDate").value,
+            returnDate: document.querySelector("#returnDate").value,
+            outbound: `${minutesToTime(document.querySelector("#outFrom").value)}-${minutesToTime(document.querySelector("#outTo").value)}`,
+            inbound: `${minutesToTime(document.querySelector("#backFrom").value)}-${minutesToTime(document.querySelector("#backTo").value)}`,
+            currency: "EUR",
+            locale: activeLocale,
+            country: activeLocale === "de" ? "ch" : activeLocale === "nl" ? "nl" : "us"
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Live vluchtprijzen ophalen mislukt.");
+
+        liveFlightsByDestination.clear();
+        payload.results.forEach((result) => liveFlightsByDestination.set(result.destination, result.flights));
+        liveApiStatus.textContent = `${tr("liveLoaded")} ${payload.provider}.`;
+        renderCities();
+      } catch (error) {
+        liveApiStatus.textContent = `${error.message} ${tr("localFallback")}`;
+      }
+    }
+
+    function collectTravelers() {
+      return [...document.querySelector("#people").querySelectorAll(".person")]
+        .map((row) => {
+          const inputs = row.querySelectorAll("input");
+          return {
+            name: inputs[0]?.value.trim() || "Iemand",
+            city: inputs[1]?.value.trim() || "nog geen woonplaats"
+          };
+        });
+    }
+
+    function selectedStayType() {
+      return document.querySelector('input[name="stayType"]:checked')?.value || "Maakt niet uit";
+    }
+
+    function updateTripSummary() {
+      const travelers = collectTravelers();
+      const names = travelers.map((item) => item.name).join(", ");
+      const cities = travelers.map((item) => item.city).join(", ");
+      const direct = document.querySelector("#directOnly").checked ? "alleen directe vluchten" : "directe vluchten mogen, overstappen ook";
+      const wishes = document.querySelector("#wishText").value.trim();
+
+      tripBudgetValue.textContent = `€${tripBudget.value}`;
+      comfortValue.textContent = `${comfort.value}/10`;
+      tripSummary.innerHTML = `
+        <strong>${travelers.length} reizigers: ${names}</strong>
+        <span>Vertrek vanuit ${cities}. Heen ${document.querySelector("#arrivalDate").value || "datum open"} tussen ${minutesToTime(document.querySelector("#outFrom").value)} en ${minutesToTime(document.querySelector("#outTo").value)}; terug tussen ${minutesToTime(document.querySelector("#backFrom").value)} en ${minutesToTime(document.querySelector("#backTo").value)}.</span>
+        <span>${direct}. Verblijf: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. Budget: €${tripBudget.value} p.p.</span>
+        <span>${wishes || "Nog geen vrije wensen ingevuld."}</span>
+      `;
+    }
+
+    updateTripSummary = function () {
+      const travelers = collectTravelers();
+      const names = travelers.map((item) => item.name).join(", ");
+      const cities = travelers.map((item) => item.city).join(", ");
+      const direct = document.querySelector("#directOnly").checked
+        ? (activeLocale === "de" ? "nur Direktflüge" : activeLocale === "en" ? "direct flights only" : "alleen directe vluchten")
+        : (activeLocale === "de" ? "Direktflüge oder Umstiege möglich" : activeLocale === "en" ? "direct flights or stops allowed" : "directe vluchten mogen, overstappen ook");
+      const stayLabel = activeLocale === "de" ? "Unterkunft" : activeLocale === "en" ? "Stay" : "Verblijf";
+      const budgetLabel = activeLocale === "de" ? "Budget" : activeLocale === "en" ? "Budget" : "Budget";
+      const noWishes = activeLocale === "de" ? "Noch keine freien Wünsche eingetragen." : activeLocale === "en" ? "No free-form wishes added yet." : "Nog geen vrije wensen ingevuld.";
+      const wishes = document.querySelector("#wishText").value.trim();
+
+      tripBudgetValue.textContent = `€${tripBudget.value}`;
+      comfortValue.textContent = `${comfort.value}/10`;
+      tripSummary.innerHTML = `
+        <strong>${travelers.length} ${tr("travelers")}: ${names}</strong>
+        <span>${tr("from")} ${cities}. ${tr("outFrom")} ${document.querySelector("#arrivalDate").value || ""} ${minutesToTime(document.querySelector("#outFrom").value)}-${minutesToTime(document.querySelector("#outTo").value)}; ${tr("backFrom").toLowerCase()} ${minutesToTime(document.querySelector("#backFrom").value)}-${minutesToTime(document.querySelector("#backTo").value)}.</span>
+        <span>${direct}. ${stayLabel}: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. ${budgetLabel}: €${tripBudget.value} p.p.</span>
+        <span>${wishes || noWishes}</span>
+      `;
+    };
+
+    function cityMatches(query) {
+      const clean = normalizeCity(query.trim());
+      if (!clean) return popularCities;
+
+      return majorCities
+        .map((item) => {
+          const haystack = normalizeCity(`${item.city} ${item.country}`);
+          const startsCity = normalizeCity(item.city).startsWith(clean);
+          const startsCountry = normalizeCity(item.country).startsWith(clean);
+          const includes = haystack.includes(clean);
+          const score = startsCity ? 0 : startsCountry ? 1 : includes ? 2 : 9;
+          return { ...item, score };
+        })
+        .filter((item) => item.score < 9)
+        .sort((a, b) => a.score - b.score || a.city.localeCompare(b.city))
+        .slice(0, 7);
+    }
+
+    function closeSuggestions() {
+      document.querySelectorAll(".suggestions.open").forEach((box) => {
+        box.classList.remove("open");
+        box.innerHTML = "";
+      });
+    }
+
+    function chooseSuggestion(input, city) {
+      input.value = city;
+      closeSuggestions();
+      input.focus();
+    }
+
+    function renderSuggestions(input) {
+      const box = input.closest(".autocomplete-field").querySelector(".suggestions");
+      const matches = cityMatches(input.value);
+
+      if (!matches.length) {
+        box.classList.remove("open");
+        box.innerHTML = "";
+        return;
+      }
+
+      box.innerHTML = matches.map((item, index) => `
+        <button class="suggestion${index === 0 ? " active" : ""}" type="button" role="option" data-city="${item.city}">
+          <strong>${item.city}</strong>
+          <span>${item.country}</span>
+        </button>
+      `).join("");
+      box.classList.add("open");
+    }
+
+    function setupAutocomplete(scope = document) {
+      scope.querySelectorAll(".departure-input").forEach((input) => {
+        if (input.dataset.autocompleteReady) return;
+        input.dataset.autocompleteReady = "true";
+
+        input.addEventListener("focus", () => renderSuggestions(input));
+        input.addEventListener("input", () => renderSuggestions(input));
+        input.addEventListener("keydown", (event) => {
+          const box = input.closest(".autocomplete-field").querySelector(".suggestions");
+          const options = [...box.querySelectorAll(".suggestion")];
+          if (!box.classList.contains("open") || !options.length) return;
+
+          const activeIndex = Math.max(0, options.findIndex((item) => item.classList.contains("active")));
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            const nextIndex = event.key === "ArrowDown"
+              ? Math.min(options.length - 1, activeIndex + 1)
+              : Math.max(0, activeIndex - 1);
+            options.forEach((item) => item.classList.remove("active"));
+            options[nextIndex].classList.add("active");
+            options[nextIndex].scrollIntoView({ block: "nearest" });
+          }
+
+          if (event.key === "Enter") {
+            event.preventDefault();
+            chooseSuggestion(input, options[activeIndex].dataset.city);
+          }
+
+          if (event.key === "Escape") closeSuggestions();
+        });
+      });
+    }
+
+    function setDefaultFlightDates() {
+      const departure = document.querySelector("#liveDepartureDate");
+      const returnDate = document.querySelector("#liveReturnDate");
+      const start = new Date();
+      start.setDate(start.getDate() + 30);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 3);
+      const asDateValue = (date) => date.toISOString().slice(0, 10);
+      departure.min = asDateValue(new Date());
+      returnDate.min = departure.min;
+      if (!departure.value) departure.value = asDateValue(start);
+      if (!returnDate.value) returnDate.value = asDateValue(end);
+    }
+
+    function formatFlightDate(value) {
+      if (!value) return "Onbekende tijd";
+      return new Intl.DateTimeFormat("nl-NL", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(new Date(value));
+    }
+
+    function formatDuration(value) {
+      return String(value || "").replace("PT", "").replace("H", "u ").replace("M", "m").trim();
+    }
+
+    function renderLiveResults(payload) {
+      const container = document.querySelector("#liveResults");
+      if (!payload.results?.length) {
+        container.innerHTML = '<div class="empty-state">Geen vluchten gevonden voor deze combinatie. Probeer andere datums of nabijgelegen luchthavens.</div>';
+        return;
+      }
+
+      container.innerHTML = payload.results.map((offer) => `
+        <article class="flight-result">
+          <div class="flight-legs">
+            ${offer.itineraries.map((leg, index) => `
+              <div class="flight-leg">
+                <div class="flight-route">${index === 0 ? "Heen" : "Terug"}: ${leg.from} → ${leg.to}</div>
+                <div>
+                  <strong>${formatFlightDate(leg.departure)} – ${formatFlightDate(leg.arrival)}</strong>
+                  <div class="flight-detail">${leg.carrier || "Luchtvaartmaatschappij"}${leg.flightNumber ? ` · ${leg.flightNumber}` : ""}</div>
+                </div>
+                <div class="flight-detail">${formatDuration(leg.duration)} · ${leg.stops === 0 ? "direct" : `${leg.stops} overstap${leg.stops > 1 ? "pen" : ""}`}</div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="flight-price">
+            <strong>${new Intl.NumberFormat("nl-NL", { style: "currency", currency: offer.currency }).format(offer.price)}</strong>
+            <span class="flight-detail">totaal · via ${payload.provider}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function loadProviderStatus() {
+      const status = document.querySelector("#providerStatus");
+      try {
+        const response = await fetch("/api/status");
+        if (!response.ok) throw new Error("Server niet bereikbaar");
+        const payload = await response.json();
+        const amadeus = payload.providers?.find((provider) => provider.id === "amadeus");
+        status.querySelector(".status-dot").className = `status-dot ${amadeus?.configured ? "online" : ""}`;
+        status.querySelector("span:last-child").textContent = amadeus?.configured
+          ? `Amadeus ${amadeus.environment === "test" ? "testomgeving" : "productie"} is verbonden`
+          : "Live provider nog niet geconfigureerd; voeg Amadeus API-gegevens toe aan outputs/.env";
+      } catch (error) {
+        status.querySelector(".status-dot").className = "status-dot error";
+        status.querySelector("span:last-child").textContent = "Open Alpaica via de lokale server om live prijzen te zoeken";
+      }
+    }
+
+    document.querySelector("#liveDepartureDate").addEventListener("change", (event) => {
+      const returnDate = document.querySelector("#liveReturnDate");
+      returnDate.min = event.target.value;
+      if (returnDate.value && returnDate.value < event.target.value) returnDate.value = event.target.value;
+    });
+
+    document.querySelector("#liveFlightForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      closeSuggestions();
+      const button = document.querySelector("#liveSearchButton");
+      const results = document.querySelector("#liveResults");
+      button.disabled = true;
+      button.textContent = "Vluchten zoeken...";
+      results.innerHTML = '<div class="empty-state">Prijzen en routes worden live opgehaald...</div>';
+
+      try {
+        const response = await fetch("/api/flights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            origin: document.querySelector("#liveOrigin").value,
+            destination: document.querySelector("#liveDestination").value,
+            departureDate: document.querySelector("#liveDepartureDate").value,
+            returnDate: document.querySelector("#liveReturnDate").value,
+            adults: document.querySelector("#liveAdults").value,
+            currency: "EUR"
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Zoeken mislukt");
+        renderLiveResults(payload);
+      } catch (error) {
+        results.innerHTML = `<div class="empty-state">${error.message}</div>`;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Zoek live prijzen";
+      }
+    });
+
+    function renderCities() {
+      const max = Number(tripBudget?.value || budget.value);
+      const sorted = [...cities].sort((a, b) => {
+        if (priority.value === "Laagste prijs") return a.price - b.price;
+        if (priority.value === "Kortste reistijd") return a.time.localeCompare(b.time);
+        return b.score - a.score;
+      });
+
+      cityList.innerHTML = sorted.map((city) => {
+        const overBudget = city.price > max;
+        return `
+          <article class="city-card" style="${overBudget ? "opacity:.58" : ""}">
+            <div class="city-main">
+              <h3>${city.name} <span class="chip">${city.score}/100</span></h3>
+              <p>${city.route}</p>
+              <div class="city-meta">
+                <div class="metric"><b>${city.time}</b><span>gem. reistijd</span></div>
+                <div class="metric"><b>${city.changes}</b><span>overstappen</span></div>
+                <div class="metric"><b>${city.arrival}</b><span>gezamenlijk aankomen</span></div>
+                <div class="metric"><b>${city.hotel}</b><span>hotel per nacht</span></div>
+              </div>
+            </div>
+            <div class="price">
+              <b>€${city.price}</b>
+              <span>vanaf p.p.</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    renderCities = function () {
+      const max = Number(tripBudget?.value || budget.value);
+      const requested = selectedStayType();
+      const ranked = candidateCities
+        .map((city) => ({
+          ...city,
+          flights: flightBreakdown(city),
+          score: scoreCity(city),
+          stayOk: requested === "Maakt niet uit" || city.stayTypes.includes(requested)
+        }))
+        .map((city) => ({
+          ...city,
+          price: Math.round(city.flights.reduce((sum, flight) => sum + flight.price, 0) / Math.max(1, city.flights.length)) + city.hotel,
+          highestPersonPrice: Math.max(...city.flights.map((flight) => flight.price + city.hotel))
+        }))
+        .filter((city) => city.available && city.stayOk && city.highestPersonPrice <= max)
+        .sort((a, b) => activeSort === "price" ? a.price - b.price : b.score - a.score || a.price - b.price);
+
+      if (!ranked.length) {
+        cityList.innerHTML = '<div class="empty-state">Geen stad voldoet nu aan budget, beschikbaarheid en verblijfstype. Verhoog het budget of kies een ruimer accommodatie-type.</div>';
+        return;
+      }
+
+      const best = ranked[0];
+      document.querySelector(".score span").textContent = best.score;
+      document.querySelector(".score").style.background = `conic-gradient(var(--teal) 0 ${best.score}%, #dce8e9 ${best.score}% 100%)`;
+      document.querySelector(".score-copy h3").textContent = `${best.name} komt als beste match naar voren`;
+      document.querySelector(".score-copy p").textContent = best.note;
+
+      cityList.innerHTML = ranked.map((city) => `
+        <article class="city-card">
+          <div class="city-main">
+            <h3>${city.name} <span class="chip">${city.score}/100</span></h3>
+            <p>${city.note}</p>
+            <div class="city-meta">
+              <div class="metric"><b>${city.time}</b><span>gem. reistijd</span></div>
+              <div class="metric"><b>${city.direct}</b><span>directe routes</span></div>
+              <div class="metric"><b>${city.arrival}</b><span>gezamenlijk aankomen</span></div>
+              <div class="metric"><b>€${city.hotel}</b><span>verblijf p.p.</span></div>
+            </div>
+            <div class="chips">
+              ${city.tags.slice(0, 4).map((tag) => `<span class="chip">${tag}</span>`).join("")}
+            </div>
+          </div>
+          <div class="price">
+            <b>€${city.price}</b>
+            <span>gem. vlucht + verblijf p.p.</span>
+          </div>
+          <div class="flight-breakdown">
+            <h4>Vluchten per reiziger</h4>
+            ${city.flights.map((flight) => `
+              <div class="traveler-flight">
+                <div><b>${flight.traveler}</b><span>${flight.origin} → ${flight.destination}</span></div>
+                <div><b>Heen ${flight.outbound}</b><span>${flight.airline}</span></div>
+                <div><b>Terug ${flight.inbound}</b><span>directe/lichte route</span></div>
+                <div><b>€${flight.price}</b><span>vlucht</span></div>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    };
+
+    renderCities = function () {
+      const max = Number(tripBudget?.value || budget.value);
+      const requested = selectedStayType();
+      const ranked = candidateCities
+        .map((city) => ({
+          ...city,
+          flights: flightBreakdown(city),
+          score: scoreCity(city),
+          stayOk: requested === "Maakt niet uit" || city.stayTypes.includes(requested)
+        }))
+        .map((city) => ({
+          ...city,
+          price: city.flights.length
+            ? Math.round(city.flights.reduce((sum, flight) => sum + Number(flight.price || 0), 0) / Math.max(1, city.flights.length)) + city.hotel
+            : city.travel + city.hotel,
+          highestPersonPrice: city.flights.length
+            ? Math.max(...city.flights.map((flight) => Number(flight.price || 0) + city.hotel))
+            : city.travel + city.hotel
+        }))
+        .filter((city) => city.available && city.stayOk && city.highestPersonPrice <= max)
+        .sort((a, b) => activeSort === "price" ? a.price - b.price : b.score - a.score || a.price - b.price);
+
+      if (!ranked.length) {
+        cityList.innerHTML = '<div class="empty-state">Geen stad voldoet nu aan budget, beschikbaarheid en verblijfstype. Verhoog het budget of kies een ruimer accommodatie-type.</div>';
+        return;
+      }
+
+      const best = ranked[0];
+      document.querySelector(".score span").textContent = best.score;
+      document.querySelector(".score").style.background = `conic-gradient(var(--teal) 0 ${best.score}%, #dce8e9 ${best.score}% 100%)`;
+      document.querySelector(".score-copy h3").textContent = `${best.name} komt als beste match naar voren`;
+      document.querySelector(".score-copy p").textContent = best.note;
+
+      cityList.innerHTML = ranked.map((city) => `
+        <article class="city-card">
+          <div class="city-main">
+            <h3>${city.name} <span class="chip">${city.score}/100</span></h3>
+            <p>${city.note}</p>
+            <div class="city-meta">
+              <div class="metric"><b>${city.time}</b><span>gem. reistijd</span></div>
+              <div class="metric"><b>${city.direct}</b><span>directe routes</span></div>
+              <div class="metric"><b>${city.arrival}</b><span>gezamenlijk aankomen</span></div>
+              <div class="metric"><b>€${city.hotel}</b><span>verblijf p.p.</span></div>
+            </div>
+            <div class="chips">
+              ${city.tags.slice(0, 4).map((tag) => `<span class="chip">${tag}</span>`).join("")}
+            </div>
+          </div>
+          <div class="price">
+            <b>€${city.price}</b>
+            <span>gem. vlucht + verblijf p.p.</span>
+          </div>
+          ${renderFlightOptions(city)}
+          ${renderAccommodationOptions(city)}
+        </article>
+      `).join("");
+    };
+
+    let selectedAirportCodes = new Set();
+    let airportFiltersInitialized = false;
+
+    const homeAirportMap = {
+      amsterdam: ["AMS", "RTM", "EIN"], rotterdam: ["RTM", "AMS"], "den haag": ["RTM", "AMS"], utrecht: ["AMS", "RTM"], eindhoven: ["EIN", "AMS", "BRU"],
+      borne: ["AMS", "DUS", "FMO", "EIN"], hengelo: ["AMS", "DUS", "FMO"], enschede: ["AMS", "DUS", "FMO"], almelo: ["AMS", "DUS", "FMO"],
+      zurich: ["ZRH", "BSL", "GVA"], "zuerich": ["ZRH", "BSL", "GVA"], basel: ["BSL", "ZRH"], geneva: ["GVA", "ZRH"], bern: ["ZRH", "BSL"],
+      brussels: ["BRU", "CRL", "ANR"], brussel: ["BRU", "CRL", "ANR"], antwerp: ["ANR", "BRU"], london: ["LHR", "LGW", "STN", "LCY"],
+      paris: ["CDG", "ORY", "BVA"], berlin: ["BER"], hamburg: ["HAM"], munich: ["MUC"], frankfurt: ["FRA"], dusseldorf: ["DUS", "CGN"]
+    };
+
+    function timeWindow() {
+      return {
+        outboundTimeWindow: { earliest: Number(document.querySelector("#outFrom").value), latest: Number(document.querySelector("#outTo").value) },
+        returnTimeWindow: { earliest: Number(document.querySelector("#backFrom").value), latest: Number(document.querySelector("#backTo").value) }
+      };
+    }
+
+    function timeWindowText(windowValue) {
+      return `${minutesToTime(windowValue.earliest)}-${minutesToTime(windowValue.latest)}`;
+    }
+
+    function ensureRangeOrder(startId, endId) {
+      const start = document.querySelector(`#${startId}`);
+      const end = document.querySelector(`#${endId}`);
+      if (Number(start.value) > Number(end.value) - 30) {
+        if (document.activeElement === start) end.value = Math.min(1430, Number(start.value) + 30);
+        else start.value = Math.max(0, Number(end.value) - 30);
+      }
+    }
+
+    updateTimeLabels = function () {
+      ensureRangeOrder("outFrom", "outTo");
+      ensureRangeOrder("backFrom", "backTo");
+      const windows = timeWindow();
+      document.querySelector("#outboundWindowLabel").textContent = timeWindowText(windows.outboundTimeWindow);
+      document.querySelector("#returnWindowLabel").textContent = timeWindowText(windows.returnTimeWindow);
+    };
+
+    function homeAirportsFor(city) {
+      const key = normalizeCity(city);
+      if (/^[A-Za-z]{3}$/.test(city.trim())) return [city.trim().toUpperCase()];
+      return homeAirportMap[key] || airportAlternatives[cityAirport(city)] || [cityAirport(city)];
+    }
+
+    function activeTravelersWithAirports() {
+      return collectTravelers().map((traveler) => ({
+        ...traveler,
+        departureAirportOptions: homeAirportsFor(traveler.city).filter((code) => selectedAirportCodes.size === 0 || selectedAirportCodes.has(code))
+      }));
+    }
+
+    function routeSeed(...values) {
+      return normalizeCity(values.join("-")).split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    }
+
+    function durationText(minutes) {
+      const value = Math.max(0, Number(minutes || 0));
+      return `${Math.floor(value / 60)}u ${String(value % 60).padStart(2, "0")}m`;
+    }
+
+    function routeStopLabel(stops) {
+      if (stops === 0) return activeLocale === "en" ? "direct" : activeLocale === "de" ? "direkt" : "direct";
+      if (stops === 1) return activeLocale === "en" ? "one stop" : activeLocale === "de" ? "1 Stopp" : "1 overstap";
+      return activeLocale === "en" ? "multiple stops" : activeLocale === "de" ? "mehrere Stopps" : "meerdere stops";
+    }
+
+    function demoRouteFor(city, traveler, index) {
+      const departureAirport = traveler.departureAirportOptions[0];
+      const arrivalAirport = (city.airportCodes || []).find((code) => selectedAirportCodes.size === 0 || selectedAirportCodes.has(code)) || city.airportCodes?.[0];
+      if (!departureAirport || !arrivalAirport) return null;
+      const seed = routeSeed(traveler.name, traveler.city, city.name, departureAirport, arrivalAirport);
+      const windows = timeWindow();
+      const outWidth = Math.max(30, windows.outboundTimeWindow.latest - windows.outboundTimeWindow.earliest);
+      const backWidth = Math.max(30, windows.returnTimeWindow.latest - windows.returnTimeWindow.earliest);
+      const departureOffset = (seed + index * 35) % outWidth;
+      const returnOffset = (seed + index * 45) % backWidth;
+      const departureMinutes = clampMinutes(windows.outboundTimeWindow.earliest + departureOffset);
+      const returnMinutes = clampMinutes(windows.returnTimeWindow.earliest + returnOffset);
+      const directAllowed = document.querySelector("#directOnly").checked;
+      const stops = directAllowed ? 0 : (seed % 5 === 0 ? 2 : seed % 3 === 0 ? 1 : 0);
+      const flightDuration = city.travel + stops * 55 + (seed % 24);
+      const homeToAirportDuration = 25 + (seed % 75);
+      const arrivalToCenterDuration = 18 + ((seed + city.name.length) % 42);
+      const totalTravelDuration = homeToAirportDuration + flightDuration + arrivalToCenterDuration;
+      const price = Math.round(city.travel * (0.82 + (seed % 31) / 100) + stops * 45);
+      return {
+        traveler: traveler.name,
+        departureAirport,
+        arrivalAirport,
+        nearbyAlternativeAirports: [...new Set([...(traveler.departureAirportOptions || []), ...(city.airportCodes || [])])].filter((code) => code !== departureAirport && code !== arrivalAirport),
+        airline: airlines[seed % airlines.length],
+        outbound: `${minutesToTime(departureMinutes)}-${minutesToTime(clampMinutes(departureMinutes + flightDuration))}`,
+        inbound: `${minutesToTime(returnMinutes)}-${minutesToTime(clampMinutes(returnMinutes + flightDuration))}`,
+        price,
+        flightDuration,
+        totalTravelDuration,
+        homeToAirportDuration,
+        arrivalToCenterDuration,
+        isDirect: stops === 0,
+        stops,
+        source: "Demo route model",
+        sourceType: "demo"
+      };
+    }
+
+    function routesForCity(city) {
+      const live = liveFlightsByDestination.get(city.name);
+      if (live?.length) {
+        return live
+          .map((flight) => ({
+            ...flight,
+            departureAirport: flight.departureAirport || flight.origin,
+            arrivalAirport: flight.arrivalAirport || flight.destination,
+            flightDuration: flight.flightDuration || flight.duration || 0,
+            totalTravelDuration: flight.totalTravelDuration || flight.duration || 0,
+            isDirect: flight.isDirect ?? Number(flight.stops || 0) === 0,
+            sourceType: "live"
+          }))
+          .filter((flight) => selectedAirportCodes.size === 0 || (selectedAirportCodes.has(flight.departureAirport) && selectedAirportCodes.has(flight.arrivalAirport)))
+          .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
+      }
+
+      return activeTravelersWithAirports()
+        .map((traveler, index) => demoRouteFor(city, traveler, index))
+        .filter(Boolean)
+        .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
+    }
+
+    function scoreDestination(city, flights) {
+      const wishes = normalizeCity(document.querySelector("#wishText").value);
+      const requested = selectedStayType();
+      const tagHits = city.tags.filter((tag) => wishes.includes(normalizeCity(tag))).length;
+      const averageFlightPrice = flights.length ? flights.reduce((sum, flight) => sum + Number(flight.price || 0), 0) / flights.length : city.travel;
+      const averageTotalTravelDuration = flights.length ? flights.reduce((sum, flight) => sum + Number(flight.totalTravelDuration || 0), 0) / flights.length : city.travel + 90;
+      const totalEstimate = averageFlightPrice + city.hotel;
+      const withinBudget = totalEstimate <= Number(tripBudget.value);
+      const stayOk = requested === "Maakt niet uit" || city.stayTypes.includes(requested);
+      // The weights below are intentionally visible and simple, so tuning the ranking later is straightforward.
+      const breakdown = {
+        wishes: wishes ? Math.min(45, tagHits * 15 + Math.min(10, city.tags.length)) : 24,
+        budget: withinBudget ? 22 : Math.max(0, 22 - Math.round((totalEstimate - Number(tripBudget.value)) / 18)),
+        stay: stayOk ? 14 : 0,
+        route: Math.max(0, 14 - Math.round(Math.max(0, averageTotalTravelDuration - 260) / 35)) + (flights.some((flight) => flight.isDirect) ? 3 : 0),
+        diversity: Math.max(0, 5 - Math.floor(destinationCities.findIndex((item) => item.name === city.name) / 16))
+      };
+      return {
+        score: Math.max(0, Math.min(100, Math.round(Object.values(breakdown).reduce((sum, value) => sum + value, 0)))),
+        breakdown,
+        averageFlightPrice,
+        averageTotalTravelDuration,
+        totalEstimate,
+        withinBudget,
+        stayOk
+      };
+    }
+
+    function airportFilterOptions() {
+      const departure = activeTravelersWithAirports().flatMap((traveler) => homeAirportsFor(traveler.city));
+      const arrivals = destinationCities.flatMap((city) => city.airportCodes || []);
+      return [...new Set([...departure, ...arrivals])].filter(Boolean).slice(0, 40);
+    }
+
+    function ensureAirportFilterElement() {
+      let filter = document.querySelector("#airportFilters");
+      if (!filter) {
+        filter = document.createElement("div");
+        filter.id = "airportFilters";
+        filter.className = "trip-summary";
+        cityList.parentElement.insertBefore(filter, cityList);
+      }
+      return filter;
+    }
+
+    function renderAirportFilters() {
+      const filter = ensureAirportFilterElement();
+      const codes = airportFilterOptions();
+      if (!airportFiltersInitialized) {
+        codes.forEach((code) => selectedAirportCodes.add(code));
+        airportFiltersInitialized = true;
+      }
+      const label = activeLocale === "en" ? "Airports" : activeLocale === "de" ? "Flughafen" : "Luchthavens";
+      filter.innerHTML = `
+        <strong>${label}</strong>
+        <span>${activeLocale === "en" ? "Deselect airports you do not want." : activeLocale === "de" ? "Entferne Flughafen, die ihr nicht wollt." : "Vink luchthavens uit die jullie niet willen gebruiken."}</span>
+        <div class="toggle-row">
+          ${codes.map((code) => `
+            <label class="check-tile">
+              <input class="airport-toggle" type="checkbox" value="${code}" ${selectedAirportCodes.has(code) ? "checked" : ""}>
+              ${code}
+            </label>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    liveDestinations = function () {
+      return destinationCities
+        .map((city) => {
+          const flights = routesForCity(city);
+          const scored = scoreDestination(city, flights);
+          return { ...city, ...scored, flights };
+        })
+        .filter((city) => city.stayOk && city.withinBudget && city.flights.length)
+        .sort((a, b) => b.score - a.score || a.totalEstimate - b.totalEstimate)
+        .slice(0, 4)
+        .map((city) => city.name);
+    };
+
+    loadLiveGroupFlights = async function () {
+      if (location.protocol === "file:") {
+        liveApiStatus.hidden = false;
+        liveApiStatus.textContent = "Live vluchtdata werkt alleen via http://localhost:4180/index.html. De zichtbare routes zijn duidelijk gemarkeerde demo-berekeningen.";
+        return;
+      }
+
+      liveApiStatus.hidden = false;
+      liveApiStatus.textContent = tr("liveLoading");
+      const windows = timeWindow();
+
+      try {
+        const response = await fetch("/api/group-flights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            travelers: collectTravelers(),
+            destinations: liveDestinations(),
+            departureDate: document.querySelector("#arrivalDate").value,
+            returnDate: document.querySelector("#returnDate").value,
+            outboundTimeWindow: {
+              earliest: minutesToTime(windows.outboundTimeWindow.earliest),
+              latest: minutesToTime(windows.outboundTimeWindow.latest)
+            },
+            returnTimeWindow: {
+              earliest: minutesToTime(windows.returnTimeWindow.earliest),
+              latest: minutesToTime(windows.returnTimeWindow.latest)
+            },
+            allowedAirportCodes: [...selectedAirportCodes],
+            directOnly: document.querySelector("#directOnly").checked,
+            currency: "EUR",
+            locale: activeLocale,
+            country: activeLocale === "de" ? "ch" : activeLocale === "nl" ? "nl" : "us"
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Live vluchtprijzen ophalen mislukt.");
+
+        liveFlightsByDestination.clear();
+        payload.results.forEach((result) => liveFlightsByDestination.set(result.destination, result.flights));
+        liveApiStatus.textContent = `${tr("liveLoaded")} ${payload.provider}.`;
+        renderCities();
+      } catch (error) {
+        liveApiStatus.textContent = `${error.message} De app toont nu demo-routes apart van de live adapter.`;
+      }
+    };
+
+    renderFlightOptions = function (city) {
+      if (!city.flights.length) {
+        return `<div class="flight-breakdown"><h4>Vluchten per reiziger</h4><div class="empty-state">Geen route binnen de gekozen luchthavens, tijdvensters en direct-filter.</div></div>`;
+      }
+
+      return `
+        <div class="flight-breakdown">
+          <h4>Vluchten per reiziger</h4>
+          ${city.flights.map((flight, index) => `
+            <details class="click-detail traveler-flight" ${index === 0 ? "open" : ""}>
+              <summary>
+                <span>${flight.traveler}: ${flight.departureAirport} &rarr; ${flight.arrivalAirport}</span>
+                <span>&euro;${flight.price || "?"}</span>
+              </summary>
+              <div class="detail-body">
+                <span class="provider-pill">${flight.source || "Demo route model"}</span>
+                <div class="detail-row"><b>Route</b><span>${flight.departureAirport} naar ${flight.arrivalAirport}</span></div>
+                <div class="detail-row"><b>Alternatieven</b><span>${flight.nearbyAlternativeAirports?.length ? flight.nearbyAlternativeAirports.join(", ") : "geen gekozen alternatieven"}</span></div>
+                <div class="detail-row"><b>Heen</b><span>${flight.outbound || "tijd via provider"}</span></div>
+                <div class="detail-row"><b>Terug</b><span>${flight.inbound || "tijd via provider"}</span></div>
+                <div class="detail-row"><b>Type vlucht</b><span>${routeStopLabel(Number(flight.stops || 0))}</span></div>
+                <div class="detail-row"><b>Vluchtduur</b><span>${durationText(flight.flightDuration || flight.duration)}</span></div>
+                <div class="detail-row"><b>Totale reistijd</b><span>${durationText(flight.totalTravelDuration || flight.duration)} incl. ${durationText(flight.homeToAirportDuration || 0)} naar vertrekluchthaven en ${durationText(flight.arrivalToCenterDuration || 0)} naar centrum/verblijf</span></div>
+                <div class="detail-row"><b>Airline</b><span>${flight.airline || "Nog niet bekend"}</span></div>
+                <div class="detail-row"><b>Prijs</b><span>&euro;${flight.price || "?"} vlucht p.p.</span></div>
+              </div>
+            </details>
+          `).join("")}
+        </div>
+      `;
+    };
+
+    renderCities = function () {
+      renderAirportFilters();
+      const requested = selectedStayType();
+      const ranked = destinationCities
+        .map((city) => {
+          const flights = routesForCity(city);
+          const scored = scoreDestination(city, flights);
+          return {
+            ...city,
+            ...scored,
+            flights,
+            stayOk: requested === "Maakt niet uit" || city.stayTypes.includes(requested),
+            price: Math.round(scored.totalEstimate),
+            highestPersonPrice: flights.length ? Math.max(...flights.map((flight) => Number(flight.price || 0) + city.hotel)) : city.travel + city.hotel
+          };
+        })
+        .filter((city) => city.available && city.stayOk && city.withinBudget && city.flights.length)
+        .sort((a, b) => activeSort === "price" ? a.price - b.price || b.score - a.score : b.score - a.score || a.price - b.price)
+        .slice(0, 12);
+
+      if (!ranked.length) {
+        cityList.innerHTML = '<div class="empty-state">Geen stad voldoet nu aan budget, luchthavens, directe routes en verblijfstype. Zet meer luchthavens aan, verhoog het budget of sta overstappen toe.</div>';
+        return;
+      }
+
+      const best = ranked[0];
+      document.querySelector(".score span").textContent = best.score;
+      document.querySelector(".score").style.background = `conic-gradient(var(--teal) 0 ${best.score}%, #dce8e9 ${best.score}% 100%)`;
+      document.querySelector(".score-copy h3").textContent = `${best.name} komt als beste match naar voren`;
+      document.querySelector(".score-copy p").textContent = `${best.note} Score: wensen ${best.breakdown.wishes}, budget ${best.breakdown.budget}, verblijf ${best.breakdown.stay}, route ${best.breakdown.route}.`;
+
+      cityList.innerHTML = ranked.map((city) => `
+        <article class="city-card">
+          <div class="city-main">
+            <h3>${city.name} <span class="chip">${city.score}/100</span></h3>
+            <p>${city.note}</p>
+            <div class="city-meta">
+              <div class="metric"><b>${durationText(city.averageTotalTravelDuration)}</b><span>totale reistijd</span></div>
+              <div class="metric"><b>${city.flights.filter((flight) => flight.isDirect).length}</b><span>directe routes</span></div>
+              <div class="metric"><b>${city.airportCodes.join(", ")}</b><span>aankomstluchthavens</span></div>
+              <div class="metric"><b>&euro;${city.hotel}</b><span>verblijf p.p.</span></div>
+            </div>
+            <div class="chips">
+              ${city.tags.slice(0, 5).map((tag) => `<span class="chip">${tag}</span>`).join("")}
+            </div>
+          </div>
+          <div class="price">
+            <b>&euro;${city.price}</b>
+            <span>gem. vlucht + verblijf p.p.</span>
+          </div>
+          ${renderFlightOptions(city)}
+          ${renderAccommodationOptions(city)}
+        </article>
+      `).join("");
+    };
+
+    document.querySelector("#addPerson").addEventListener("click", () => {
+      const people = document.querySelector("#people");
+      const count = people.children.length + 1;
+      const row = document.createElement("div");
+      row.className = "person";
+      row.innerHTML = `
+        <label>Naam
+          <input placeholder="Naam" aria-label="Naam deelnemer ${count}">
+        </label>
+        <label>Woonplaats
+          <span class="autocomplete-field">
+            <input class="departure-input" placeholder="Stad of woonplaats" aria-label="Woonplaats deelnemer ${count}" autocomplete="off">
+            <span class="suggestions" role="listbox"></span>
+          </span>
+        </label>
+        <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
+      `;
+      people.appendChild(row);
+      setupAutocomplete(row);
+      updatePersonLabels();
+      updateTripSummary();
+    });
+
+    document.addEventListener("click", (event) => {
+      const suggestion = event.target.closest(".suggestion");
+      if (suggestion) {
+        const field = suggestion.closest(".autocomplete-field");
+        chooseSuggestion(field.querySelector(".departure-input"), suggestion.dataset.city);
+        updateTripSummary();
+        renderCities();
+        return;
+      }
+
+      if (event.target.matches(".person .icon-button")) {
+        const peopleList = event.target.closest("#people");
+        const rows = peopleList ? peopleList.querySelectorAll(".person") : [];
+        if (rows.length > 1) event.target.closest(".person").remove();
+        updateTripSummary();
+        renderCities();
+      }
+
+      if (event.target.matches(".tab")) {
+        document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+        event.target.classList.add("active");
+      }
+
+      if (!event.target.closest(".autocomplete-field")) closeSuggestions();
+    });
+
+    document.addEventListener("change", (event) => {
+      if (!event.target.matches(".airport-toggle")) return;
+      if (event.target.checked) selectedAirportCodes.add(event.target.value);
+      else selectedAirportCodes.delete(event.target.value);
+      renderCities();
+    });
+
+    document.querySelector("#searchButton").addEventListener("click", async () => {
+      updateTripSummary();
+      renderCities();
+      document.querySelector("#resultaten").scrollIntoView({ behavior: "smooth" });
+      await loadLiveGroupFlights();
+    });
+
+    budget.addEventListener("input", () => {
+      budgetValue.textContent = `€${budget.value}`;
+      tripBudget.value = budget.value;
+      updateTripSummary();
+      renderCities();
+    });
+
+    document.querySelector("#zoek").addEventListener("input", updateTripSummary);
+    document.querySelector("#zoek").addEventListener("change", updateTripSummary);
+    document.querySelector("#zoek").addEventListener("input", renderCities);
+    document.querySelector("#zoek").addEventListener("change", renderCities);
+    document.querySelectorAll(".sort-pill").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeSort = button.dataset.sort;
+        document.querySelectorAll(".sort-pill").forEach((item) => item.classList.toggle("active", item === button));
+        renderCities();
+      });
+    });
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeLocale = button.dataset.lang;
+        localStorage.setItem("alpaicaLocale", activeLocale);
+        localStorage.setItem("alpaicaLocaleManual", "true");
+        applyLocale();
+        updateTripSummary();
+        renderCities();
+      });
+    });
+    ["outFrom", "outTo", "backFrom", "backTo"].forEach((id) => {
+      document.querySelector(`#${id}`).addEventListener("input", updateTimeLabels);
+    });
+    document.querySelector("#arrivalDate").addEventListener("change", () => {
+      syncTripDates();
+      updateTripSummary();
+      renderCities();
+    });
+    document.querySelector("#returnDate").addEventListener("change", () => {
+      syncTripDates();
+      updateTripSummary();
+      renderCities();
+    });
+    tripBudget.addEventListener("input", () => {
+      budget.value = Math.min(Number(budget.max), Number(tripBudget.value));
+      budgetValue.textContent = `€${budget.value}`;
+      renderCities();
+    });
+    setDefaultFlightDates();
+    setupAutocomplete();
+    applyLocale();
+    syncTripDates();
+    updateTimeLabels();
+    updateTripSummary();
+    renderCities();
+  </script>
+</body>
+</html>
