@@ -1,4 +1,4 @@
-const http = require("http");
+const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
@@ -420,65 +420,60 @@ async function searchGroupFlights(body) {
   };
 }
 
-async function handleApi(req, res, url) {
-  if (req.method === "GET" && url.pathname === "/api/status") {
-    sendJson(res, 200, {
-      providers: [{ id: "amadeus", name: "Amadeus", configured: Boolean(clientId && clientSecret), environment: amadeusBase.includes("test.") ? "test" : "production" }],
-      flightSearchProviders: [
-        { id: "serpapi", name: "SerpApi Google Flights", configured: Boolean(serpApiKey), endpoint: "https://serpapi.com/search?engine=google_flights" },
-        { id: "searchapi", name: "SearchAPI Google Flights", configured: Boolean(searchApiKey) },
-        { id: "brightdata", name: "Bright Data SERP API", configured: Boolean(brightDataKey) }
-      ],
-      skyscanner: { configured: false, note: "Partner API-toegang vereist" }
-    });
-    return;
-  }
-
-  if (req.method === "GET" && url.pathname === "/api/locations") {
-    const keyword = url.searchParams.get("q") || "";
-    const payload = await amadeusGet("/v1/reference-data/locations", { subType: "CITY,AIRPORT", keyword, "page[limit]": 8, view: "LIGHT" });
-    sendJson(res, 200, { results: (payload.data || []).map((item) => ({ name: item.name, code: item.iataCode, type: item.subType, city: item.address?.cityName, country: item.address?.countryName })) });
-    return;
-  }
-
-  if (req.method === "POST" && url.pathname === "/api/flights") {
-    const body = await readJson(req);
-    if (!body.departureDate) throw Object.assign(new Error("Kies een vertrekdatum."), { status: 400 });
-    sendJson(res, 200, await searchFlights(body));
-    return;
-  }
-
-  if (req.method === "POST" && url.pathname === "/api/group-flights") {
-    const body = await readJson(req);
-    sendJson(res, 200, await searchGroupFlights(body));
-    return;
-  }
-
-  sendJson(res, 404, { error: "API-route niet gevonden" });
+function asyncRoute(handler) {
+  return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 }
 
-function serveStatic(req, res, url) {
-  const pathname = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
-  const file = path.resolve(root, `.${pathname}`);
-  if (!file.startsWith(root)) return sendJson(res, 403, { error: "Niet toegestaan" });
-  fs.readFile(file, (error, data) => {
-    if (error) return sendJson(res, 404, { error: "Bestand niet gevonden" });
-    res.writeHead(200, { "Content-Type": mimeTypes[path.extname(file)] || "application/octet-stream" });
-    res.end(data);
-  });
+function providerStatus() {
+  return {
+    providers: [{ id: "amadeus", name: "Amadeus", configured: Boolean(clientId && clientSecret), environment: amadeusBase.includes("test.") ? "test" : "production" }],
+    flightSearchProviders: [
+      { id: "serpapi", name: "SerpApi Google Flights", configured: Boolean(serpApiKey), endpoint: "https://serpapi.com/search?engine=google_flights" },
+      { id: "searchapi", name: "SearchAPI Google Flights", configured: Boolean(searchApiKey) },
+      { id: "brightdata", name: "Bright Data SERP API", configured: Boolean(brightDataKey) }
+    ],
+    skyscanner: { configured: false, note: "Partner API-toegang vereist" }
+  };
 }
 
-const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
-  try {
-    if (url.pathname.startsWith("/api/")) await handleApi(req, res, url);
-    else serveStatic(req, res, url);
-  } catch (error) {
-    console.error(error.details || error);
-    sendJson(res, error.status || 500, { error: error.message || "Onverwachte serverfout" });
-  }
+const app = express();
+
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
+app.use(express.static(root, { extensions: ["html"] }));
+
+app.get("/health", (req, res) => {
+  res.json({ ok: true, app: "alpaica", serpapiConfigured: Boolean(serpApiKey) });
 });
 
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Alpaica draait op http://localhost:${port}`);
+app.get("/api/status", (req, res) => {
+  res.json(providerStatus());
+});
+
+app.get("/api/locations", asyncRoute(async (req, res) => {
+  const keyword = req.query.q || "";
+  const payload = await amadeusGet("/v1/reference-data/locations", { subType: "CITY,AIRPORT", keyword, "page[limit]": 8, view: "LIGHT" });
+  res.json({ results: (payload.data || []).map((item) => ({ name: item.name, code: item.iataCode, type: item.subType, city: item.address?.cityName, country: item.address?.countryName })) });
+}));
+
+app.post("/api/flights", asyncRoute(async (req, res) => {
+  if (!req.body.departureDate) throw Object.assign(new Error("Kies een vertrekdatum."), { status: 400 });
+  res.json(await searchFlights(req.body));
+}));
+
+app.post("/api/group-flights", asyncRoute(async (req, res) => {
+  res.json(await searchGroupFlights(req.body));
+}));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(root, "index.html"));
+});
+
+app.use((error, req, res, next) => {
+  console.error(error.details || error);
+  res.status(error.status || 500).json({ error: error.message || "Onverwachte serverfout" });
+});
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Alpaica Express draait op http://localhost:${port}`);
 });
