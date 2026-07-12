@@ -1817,6 +1817,20 @@
       note: `Past vooral bij: ${tags.slice(0, 4).join(", ")}.`,
       scoreWeights: { wishes: 45, budget: 22, stay: 14, route: 14, diversity: 5 }
     }));
+
+    const cityGeo = {
+      amsterdam: [52.3676, 4.9041], rotterdam: [51.9244, 4.4777], "den haag": [52.0705, 4.3007], utrecht: [52.0907, 5.1214], eindhoven: [51.4416, 5.4697],
+      borne: [52.3014, 6.7486], hengelo: [52.2656, 6.7931], enschede: [52.2215, 6.8937], almelo: [52.3567, 6.6625],
+      brussels: [50.8503, 4.3517], brussel: [50.8503, 4.3517], antwerp: [51.2194, 4.4025],
+      zurich: [47.3769, 8.5417], "zürich": [47.3769, 8.5417], zuerich: [47.3769, 8.5417], basel: [47.5596, 7.5886], geneva: [46.2044, 6.1432],
+      paris: [48.8566, 2.3522], lyon: [45.7640, 4.8357], marseille: [43.2965, 5.3698], nice: [43.7102, 7.2620], bordeaux: [44.8378, -0.5792],
+      london: [51.5072, -0.1276], manchester: [53.4808, -2.2426], edinburgh: [55.9533, -3.1883], dublin: [53.3498, -6.2603],
+      berlin: [52.5200, 13.4050], hamburg: [53.5511, 9.9937], munich: [48.1351, 11.5820], cologne: [50.9375, 6.9603], frankfurt: [50.1109, 8.6821],
+      barcelona: [41.3874, 2.1686], valencia: [39.4699, -0.3763], madrid: [40.4168, -3.7038], seville: [37.3891, -5.9845], malaga: [36.7213, -4.4214],
+      lisbon: [38.7223, -9.1393], porto: [41.1579, -8.6291], milan: [45.4642, 9.1900], rome: [41.9028, 12.4964], venice: [45.4408, 12.3155],
+      vienna: [48.2082, 16.3738], salzburg: [47.8095, 13.0550], prague: [50.0755, 14.4378], budapest: [47.4979, 19.0402],
+      copenhagen: [55.6761, 12.5683], stockholm: [59.3293, 18.0686], oslo: [59.9139, 10.7522]
+    };
     const cities = [
       { name: "Barcelona", score: 86, route: "Directe vluchten + goede treinen naar centrum", time: "4u 15m", price: 312, hotel: "€138", changes: "0-1", arrival: "18:20" },
       { name: "Milaan", score: 81, route: "Sterke treinopties en betaalbare hotels", time: "5u 05m", price: 286, hotel: "€122", changes: "1", arrival: "17:45" },
@@ -1863,6 +1877,7 @@
     const serverWarning = document.querySelector("#serverWarning");
     const liveApiStatus = document.querySelector("#liveApiStatus");
     const liveFlightsByDestination = new Map();
+    let liveSearchAttempted = false;
     const popularCities = ["Amsterdam", "Zürich", "London", "Paris", "Barcelona", "Berlin"].map((city) => majorCities.find((item) => item.city === city)).filter(Boolean);
 
     const i18n = {
@@ -2739,6 +2754,58 @@
       return homeAirportMap[key] || airportAlternatives[cityAirport(city)] || [cityAirport(city)];
     }
 
+    function geoForCity(value) {
+      return cityGeo[normalizeCity(value)];
+    }
+
+    function distanceKm(from, to) {
+      const a = geoForCity(from);
+      const b = geoForCity(to);
+      if (!a || !b) return null;
+      const toRad = (value) => value * Math.PI / 180;
+      const earth = 6371;
+      const dLat = toRad(b[0] - a[0]);
+      const dLon = toRad(b[1] - a[1]);
+      const lat1 = toRad(a[0]);
+      const lat2 = toRad(b[0]);
+      const hav = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+      return Math.round(earth * 2 * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav)));
+    }
+
+    function groundRouteFor(city, traveler, index) {
+      const km = distanceKm(traveler.city, city.name);
+      if (km === null || km > 650) return null;
+      const isVeryShort = km <= 180;
+      const mode = isVeryShort ? "train" : "train";
+      const duration = Math.max(35, Math.round(28 + km * (isVeryShort ? 0.72 : 0.88)));
+      const price = Math.max(12, Math.round(8 + km * (isVeryShort ? 0.22 : 0.18)));
+      const windows = timeWindow();
+      const departureMinutes = clampMinutes(windows.outboundTimeWindow.earliest + (index * 25) % Math.max(30, windows.outboundTimeWindow.latest - windows.outboundTimeWindow.earliest));
+      const returnMinutes = clampMinutes(windows.returnTimeWindow.earliest + (index * 25) % Math.max(30, windows.returnTimeWindow.latest - windows.returnTimeWindow.earliest));
+      return {
+        traveler: traveler.name,
+        origin: traveler.city,
+        destination: city.name,
+        departureAirport: traveler.city,
+        arrivalAirport: city.name,
+        nearbyAlternativeAirports: [],
+        airline: mode === "train" ? "Trein / openbaar vervoer" : "Auto",
+        outbound: `${minutesToTime(departureMinutes)}-${minutesToTime(clampMinutes(departureMinutes + duration))}`,
+        inbound: `${minutesToTime(returnMinutes)}-${minutesToTime(clampMinutes(returnMinutes + duration))}`,
+        price,
+        flightDuration: 0,
+        totalTravelDuration: duration,
+        homeToAirportDuration: 0,
+        arrivalToCenterDuration: 0,
+        isDirect: true,
+        stops: 0,
+        mode,
+        distanceKm: km,
+        source: mode === "train" ? "Indicatieve treinroute" : "Indicatieve autoroute",
+        sourceType: "ground"
+      };
+    }
+
     function airportFilterAllows(code) {
       return (!airportFiltersTouched && selectedAirportCodes.size === 0) || selectedAirportCodes.has(code);
     }
@@ -2806,25 +2873,46 @@
 
     function routesForCity(city) {
       const live = liveFlightsByDestination.get(city.name);
+      const liveByTraveler = new Map((live || []).map((flight) => [normalizeCity(flight.traveler), flight]));
+      const routes = activeTravelersWithAirports()
+        .map((traveler, index) => {
+          const ground = groundRouteFor(city, traveler, index);
+          if (ground) return ground;
+          const liveFlight = liveByTraveler.get(normalizeCity(traveler.name));
+          if (liveFlight) {
+            return {
+              ...liveFlight,
+              departureAirport: liveFlight.departureAirport || liveFlight.origin,
+              arrivalAirport: liveFlight.arrivalAirport || liveFlight.destination,
+              flightDuration: liveFlight.flightDuration || liveFlight.duration || 0,
+              totalTravelDuration: liveFlight.totalTravelDuration || liveFlight.duration || 0,
+              isDirect: typeof liveFlight.isDirect === "boolean" ? liveFlight.isDirect : Number(liveFlight.stops || 0) === 0,
+              sourceType: "live"
+            };
+          }
+          return demoRouteFor(city, traveler, index);
+        })
+        .filter(Boolean)
+        .filter((flight) => flight.sourceType === "ground" || airportFilterAllows(flight.departureAirport))
+        .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
+
       if (live?.length) {
-        return live
-          .map((flight) => ({
+        return routes.map((flight) => flight.sourceType === "demo"
+          ? {
             ...flight,
-            departureAirport: flight.departureAirport || flight.origin,
-            arrivalAirport: flight.arrivalAirport || flight.destination,
-            flightDuration: flight.flightDuration || flight.duration || 0,
-            totalTravelDuration: flight.totalTravelDuration || flight.duration || 0,
-            isDirect: typeof flight.isDirect === "boolean" ? flight.isDirect : Number(flight.stops || 0) === 0,
-            sourceType: "live"
-          }))
-          .filter((flight) => airportFilterAllows(flight.departureAirport))
-          .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
+            source: "Nog geen live vlucht voor deze reiziger",
+            sourceType: "api-missing"
+          }
+          : flight);
       }
 
-      return activeTravelersWithAirports()
-        .map((traveler, index) => demoRouteFor(city, traveler, index))
-        .filter(Boolean)
-        .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
+      return routes.map((flight) => flight.sourceType === "demo"
+        ? {
+          ...flight,
+          source: liveSearchAttempted ? "Fallback route-inschatting" : "Nog niet live gezocht",
+          sourceType: liveSearchAttempted ? "fallback" : "pending-live"
+        }
+        : flight);
     }
 
     function scoreDestination(city, flights) {
@@ -2924,16 +3012,33 @@
         .map((city) => city.name);
     };
 
+    function destinationsNeedingFlights(names) {
+      const travelers = collectTravelers();
+      return names.filter((name) => {
+        const city = destinationCities.find((item) => item.name === name);
+        if (!city) return false;
+        return travelers.some((traveler, index) => !groundRouteFor(city, traveler, index));
+      });
+    }
+
     loadLiveGroupFlights = async function () {
+      liveSearchAttempted = true;
       if (location.protocol === "file:") {
         liveApiStatus.hidden = false;
-        liveApiStatus.textContent = "Live vluchtdata werkt alleen via http://localhost:4180/index.html. De zichtbare routes zijn duidelijk gemarkeerde demo-berekeningen.";
-        return;
+        liveApiStatus.textContent = "Live vluchtdata werkt alleen via de Express-backend. De app toont nu trein/auto-inschattingen en fallbackroutes.";
+        return false;
       }
 
       liveApiStatus.hidden = false;
       liveApiStatus.textContent = tr("liveLoading");
       const windows = timeWindow();
+      const destinations = destinationsNeedingFlights(liveDestinations());
+
+      if (!destinations.length) {
+        liveFlightsByDestination.clear();
+        liveApiStatus.textContent = "Voor deze korte routes gebruikt Alpaica trein/auto-inschattingen; er is geen vluchtzoekopdracht nodig.";
+        return true;
+      }
 
       try {
         const response = await fetch("/api/group-flights", {
@@ -2941,7 +3046,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             travelers: collectTravelers(),
-            destinations: liveDestinations(),
+            destinations,
             departureDate: document.querySelector("#arrivalDate").value,
             returnDate: document.querySelector("#returnDate").value,
             outboundTimeWindow: {
@@ -2965,20 +3070,21 @@
         liveFlightsByDestination.clear();
         payload.results.forEach((result) => liveFlightsByDestination.set(result.destination, result.flights));
         liveApiStatus.textContent = `${tr("liveLoaded")} ${payload.provider}.`;
-        renderCities();
+        return true;
       } catch (error) {
-        liveApiStatus.textContent = `${error.message} De app toont nu demo-routes apart van de live adapter.`;
+        liveApiStatus.textContent = `${error.message} De app toont nu trein/auto-inschattingen en duidelijk gemarkeerde fallbackroutes.`;
+        return false;
       }
     };
 
     renderFlightOptions = function (city) {
       if (!city.flights.length) {
-        return `<div class="flight-breakdown"><h4>Vluchten per reiziger</h4><div class="empty-state">Geen route binnen de gekozen luchthavens, tijdvensters en direct-filter.</div></div>`;
+        return `<div class="flight-breakdown"><h4>Routes per reiziger</h4><div class="empty-state">Geen route binnen de gekozen luchthavens, tijdvensters en direct-filter.</div></div>`;
       }
 
       return `
         <div class="flight-breakdown">
-          <h4>Vluchten per reiziger</h4>
+          <h4>Routes per reiziger</h4>
           ${city.flights.map((flight, index) => `
             <details class="click-detail traveler-flight" ${index === 0 ? "open" : ""}>
               <summary>
@@ -2991,11 +3097,11 @@
                 <div class="detail-row"><b>Alternatieven</b><span>${flight.nearbyAlternativeAirports?.length ? flight.nearbyAlternativeAirports.join(", ") : "geen gekozen alternatieven"}</span></div>
                 <div class="detail-row"><b>Heen</b><span>${flight.outbound || "tijd via provider"}</span></div>
                 <div class="detail-row"><b>Terug</b><span>${flight.inbound || "tijd via provider"}</span></div>
-                <div class="detail-row"><b>Type vlucht</b><span>${routeStopLabel(Number(flight.stops || 0))}</span></div>
-                <div class="detail-row"><b>Vluchtduur</b><span>${durationText(flight.flightDuration || flight.duration)}</span></div>
-                <div class="detail-row"><b>Totale reistijd</b><span>${durationText(flight.totalTravelDuration || flight.duration)} incl. ${durationText(flight.homeToAirportDuration || 0)} naar vertrekluchthaven en ${durationText(flight.arrivalToCenterDuration || 0)} naar centrum/verblijf</span></div>
-                <div class="detail-row"><b>Airline</b><span>${flight.airline || "Nog niet bekend"}</span></div>
-                <div class="detail-row"><b>Prijs</b><span>&euro;${flight.price || "?"} vlucht p.p.</span></div>
+                <div class="detail-row"><b>Type route</b><span>${flight.mode === "train" ? "trein / openbaar vervoer" : flight.mode === "car" ? "auto" : routeStopLabel(Number(flight.stops || 0))}</span></div>
+                <div class="detail-row"><b>${flight.mode ? "Rijtijd/reistijd" : "Vluchtduur"}</b><span>${durationText(flight.flightDuration || flight.duration || flight.totalTravelDuration)}</span></div>
+                <div class="detail-row"><b>Totale reistijd</b><span>${durationText(flight.totalTravelDuration || flight.duration)}${flight.mode ? ` over ongeveer ${flight.distanceKm} km` : ` incl. ${durationText(flight.homeToAirportDuration || 0)} naar vertrekluchthaven en ${durationText(flight.arrivalToCenterDuration || 0)} naar centrum/verblijf`}</span></div>
+                <div class="detail-row"><b>${flight.mode ? "Vervoer" : "Airline"}</b><span>${flight.airline || "Nog niet bekend"}</span></div>
+                <div class="detail-row"><b>Prijs</b><span>&euro;${flight.price || "?"} ${flight.mode ? "indicatief p.p." : "vlucht p.p."}</span></div>
               </div>
             </details>
           `).join("")}
@@ -3118,9 +3224,9 @@
 
     document.querySelector("#searchButton").addEventListener("click", async () => {
       updateTripSummary();
-      renderCities();
       document.querySelector("#resultaten").scrollIntoView({ behavior: "smooth" });
       await loadLiveGroupFlights();
+      renderCities();
     });
 
     budget.addEventListener("input", () => {
