@@ -743,6 +743,51 @@
       margin-top: 18px;
     }
 
+    .api-test-panel {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(199, 232, 239, .92);
+      border-radius: 10px;
+      background: #f7fffd;
+      box-shadow: 0 10px 28px rgba(7, 27, 73, .08);
+    }
+
+    .api-test-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .api-test-actions .secondary {
+      width: auto;
+      min-width: 180px;
+      padding-inline: 14px;
+    }
+
+    .api-test-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .api-test-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .api-test-row strong,
+    .api-test-row span {
+      overflow-wrap: anywhere;
+    }
+
     .flight-result {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -1647,6 +1692,20 @@
     </div>
 
     <section class="section" id="resultaten">
+      <div class="api-test-panel" id="apiTestPanel">
+        <div class="section-head" style="margin-bottom:0">
+          <div>
+            <h2>API-test</h2>
+            <p>Losse test om te zien of SerpApi echte vluchten teruggeeft voor Amsterdam → Barcelona en Milan → Barcelona.</p>
+          </div>
+        </div>
+        <div class="api-test-actions">
+          <button class="secondary" type="button" id="apiTestButton">Test live API</button>
+          <span class="provider-status" id="apiTestStatus"><span class="status-dot"></span><span>Nog niet getest</span></span>
+        </div>
+        <div class="api-test-list" id="apiTestResults" aria-live="polite"></div>
+      </div>
+
       <div class="section-head">
         <h2>Voorbeeldresultaat</h2>
         <p>Deze eerste versie gebruikt voorbeelddata om het productgevoel te tonen. Echte koppelingen kunnen later via vlucht-, trein- en hoteldata worden aangesloten.</p>
@@ -1876,6 +1935,9 @@
     const tripSummary = document.querySelector("#tripSummary");
     const serverWarning = document.querySelector("#serverWarning");
     const liveApiStatus = document.querySelector("#liveApiStatus");
+    const apiTestButton = document.querySelector("#apiTestButton");
+    const apiTestStatus = document.querySelector("#apiTestStatus");
+    const apiTestResults = document.querySelector("#apiTestResults");
     const liveFlightsByDestination = new Map();
     let liveSearchAttempted = false;
     const popularCities = ["Amsterdam", "Zürich", "London", "Paris", "Barcelona", "Berlin"].map((city) => majorCities.find((item) => item.city === city)).filter(Boolean);
@@ -3165,6 +3227,61 @@
       `).join("");
     };
 
+    async function runApiTest() {
+      if (location.protocol === "file:") {
+        apiTestStatus.querySelector("span:last-child").textContent = "Open via de Express-backend om live te testen.";
+        apiTestResults.innerHTML = '<div class="empty-state">Deze test werkt alleen via https://alpaica.com of lokaal via de Node/Express server, niet via file://.</div>';
+        return;
+      }
+
+      apiTestButton.disabled = true;
+      apiTestStatus.querySelector(".status-dot").className = "status-dot";
+      apiTestStatus.querySelector("span:last-child").textContent = "SerpApi test wordt opgehaald...";
+      apiTestResults.innerHTML = '<div class="empty-state">Live routes ophalen voor Amsterdam → Barcelona en Milan → Barcelona...</div>';
+
+      try {
+        const response = await fetch("/api/group-flights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            travelers: [
+              { name: "Amsterdam test", city: "Amsterdam" },
+              { name: "Milan test", city: "Milan" }
+            ],
+            destinations: ["Barcelona"],
+            departureDate: document.querySelector("#arrivalDate").value,
+            returnDate: document.querySelector("#returnDate").value,
+            allowedAirportCodes: ["AMS", "MXP", "BCN"],
+            directOnly: false,
+            currency: "EUR",
+            locale: activeLocale,
+            country: activeLocale === "de" ? "ch" : activeLocale === "nl" ? "nl" : "us"
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "API-test mislukt.");
+
+        const flights = payload.results?.flatMap((result) => result.flights.map((flight) => ({ ...flight, destinationName: result.destination }))) || [];
+        apiTestStatus.querySelector(".status-dot").className = "status-dot online";
+        apiTestStatus.querySelector("span:last-child").textContent = `${payload.provider}: ${flights.length} routes gevonden`;
+        apiTestResults.innerHTML = flights.length ? flights.map((flight) => `
+          <div class="api-test-row">
+            <div>
+              <strong>${flight.traveler}: ${flight.departureAirport || flight.origin} → ${flight.arrivalAirport || flight.destination}</strong>
+              <span>${flight.outbound || "tijd onbekend"} · ${flight.airline || "airline onbekend"} · ${routeStopLabel(Number(flight.stops || 0))}</span>
+            </div>
+            <strong>€${flight.price || "?"}</strong>
+          </div>
+        `).join("") : '<div class="empty-state">De API antwoordde, maar gaf geen betaalde vluchtopties terug voor deze test.</div>';
+      } catch (error) {
+        apiTestStatus.querySelector(".status-dot").className = "status-dot error";
+        apiTestStatus.querySelector("span:last-child").textContent = "API-test mislukt";
+        apiTestResults.innerHTML = `<div class="empty-state">${error.message}</div>`;
+      } finally {
+        apiTestButton.disabled = false;
+      }
+    }
+
     document.querySelector("#addPerson").addEventListener("click", () => {
       const people = document.querySelector("#people");
       const count = people.children.length + 1;
@@ -3228,6 +3345,8 @@
       await loadLiveGroupFlights();
       renderCities();
     });
+
+    apiTestButton?.addEventListener("click", runApiTest);
 
     budget.addEventListener("input", () => {
       budgetValue.textContent = `€${budget.value}`;

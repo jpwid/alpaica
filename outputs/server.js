@@ -37,7 +37,9 @@ const airportByCity = {
   hamburg: "HAM",
   munich: "MUC",
   frankfurt: "FRA",
-  dusseldorf: "DUS"
+  dusseldorf: "DUS",
+  milan: "MXP",
+  milaan: "MXP"
 };
 
 const destinationAirport = {
@@ -91,7 +93,7 @@ const airportAlternatives = {
   AMS: ["AMS", "RTM", "EIN"], RTM: ["RTM", "AMS"], EIN: ["EIN", "AMS", "BRU", "DUS"],
   ZRH: ["ZRH", "BSL", "GVA"], BSL: ["BSL", "ZRH"], GVA: ["GVA", "ZRH"],
   LHR: ["LHR", "LGW", "STN", "LCY"], CDG: ["CDG", "ORY", "BVA"], BRU: ["BRU", "CRL", "ANR"],
-  BCN: ["BCN", "GRO", "REU"], MXP: ["MXP", "LIN", "BGY"], FCO: ["FCO", "CIA"], OSL: ["OSL", "TRF"], ARN: ["ARN", "BMA", "NYO"]
+  BCN: ["BCN", "GRO", "REU"], MXP: ["MXP", "LIN", "BGY"], MIL: ["MXP", "LIN", "BGY"], FCO: ["FCO", "CIA"], OSL: ["OSL", "TRF"], ARN: ["ARN", "BMA", "NYO"]
 };
 
 const mimeTypes = {
