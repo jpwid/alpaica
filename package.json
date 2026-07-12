@@ -1,0 +1,12 @@
+{
+  "name": "alpaica",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Alpaica travel planning MVP with a small Node backend for flight search.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
