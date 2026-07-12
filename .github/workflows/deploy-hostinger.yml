@@ -15,13 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare deploy folder
-        run: |
-          mkdir -p dist
-          cp outputs/index.html dist/index.html
-          cp outputs/europe-cities.js dist/europe-cities.js
-          cp outputs/meetway-hero.png dist/meetway-hero.png
-
       - name: Check Hostinger secrets
         env:
           HOSTINGER_FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
@@ -58,5 +51,10 @@ jobs:
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           protocol: ${{ secrets.HOSTINGER_FTP_PROTOCOL }}
           port: ${{ secrets.HOSTINGER_FTP_PORT }}
-          local-dir: ./dist/
+          local-dir: ./outputs/
           server-dir: ${{ secrets.HOSTINGER_FTP_TARGET_DIR }}
+          exclude: |
+            **/.env
+            **/.env.example
+            **/server.js
+            **/STARTEN.md
