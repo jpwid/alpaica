@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="nl">
 <head>
   <meta charset="utf-8">
@@ -48,8 +48,8 @@
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        linear-gradient(180deg, rgba(189, 239, 255, .62), rgba(255, 247, 232, .72) 520px, #f7fbfb 920px),
-        #f7fbfb;
+        linear-gradient(180deg, rgba(236, 252, 248, .88), rgba(255, 247, 232, .68) 520px, #fbfaf6 920px),
+        #fbfaf6;
       color: var(--ink);
     }
 
@@ -65,8 +65,8 @@
       display: grid;
       grid-template-rows: auto 1fr;
       background:
-        radial-gradient(circle at 82% 22%, rgba(84, 199, 178, .20), transparent 24%),
-        linear-gradient(180deg, #c8f1ff 0%, #effbff 48%, #fff3da 100%);
+        radial-gradient(circle at 82% 22%, rgba(84, 199, 178, .18), transparent 24%),
+        linear-gradient(180deg, #effcf8 0%, #fff9ed 100%);
       color: var(--ink);
       position: relative;
       overflow: hidden;
@@ -80,7 +80,7 @@
       bottom: -42px;
       height: 120px;
       background:
-        radial-gradient(70% 120% at 50% 0%, rgba(0, 142, 148, .20), transparent 64%),
+        radial-gradient(70% 120% at 50% 0%, rgba(84, 199, 178, .16), transparent 64%),
         linear-gradient(180deg, rgba(255,255,255,.62), rgba(255, 231, 191, .86));
       border-radius: 50% 50% 0 0;
       pointer-events: none;
@@ -109,9 +109,9 @@
       width: 46px;
       height: 46px;
       flex: 0 0 auto;
-      border-radius: 14px;
+      border-radius: 50%;
       overflow: hidden;
-      background: #d9f5ff;
+      background: #eafff9;
       box-shadow: 0 8px 20px rgba(7, 27, 73, .18);
       filter: none;
     }
@@ -195,21 +195,6 @@
       gap: 16px;
     }
 
-    .brand-kicker {
-      width: fit-content;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(0, 142, 148, .24);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .70);
-      color: var(--teal-dark);
-      padding: 8px 12px;
-      font-size: .78rem;
-      font-weight: 900;
-      box-shadow: 0 10px 26px rgba(7, 27, 73, .08);
-    }
-
     h1 {
       margin: 0;
       max-width: 360px;
@@ -217,46 +202,6 @@
       line-height: 1.04;
       letter-spacing: 0;
       color: var(--ink);
-    }
-
-    .hero-tagline {
-      margin: 0;
-      color: rgba(7, 27, 73, .78);
-      font-size: 1.02rem;
-      line-height: 1.48;
-      font-weight: 650;
-    }
-
-    .mascot-strip {
-      width: min(100%, 320px);
-      display: grid;
-      grid-template-columns: 72px minmax(0, 1fr);
-      gap: 12px;
-      align-items: center;
-      border: 1px solid rgba(84, 199, 178, .30);
-      border-radius: 8px;
-      background: rgba(255,255,255,.66);
-      padding: 10px;
-      box-shadow: 0 14px 32px rgba(7, 27, 73, .10);
-    }
-
-    .mascot-strip img {
-      width: 72px;
-      height: 72px;
-      border-radius: 8px;
-      object-fit: cover;
-    }
-
-    .mascot-strip strong {
-      display: block;
-      color: var(--ink);
-      font-size: .96rem;
-    }
-
-    .mascot-strip span {
-      color: var(--muted);
-      font-size: .82rem;
-      line-height: 1.35;
     }
 
     .lead {
@@ -1148,8 +1093,8 @@
       .hero {
         min-height: auto;
         background:
-          radial-gradient(circle at 82% 20%, rgba(84, 199, 178, .18), transparent 26%),
-          linear-gradient(180deg, #c8f1ff 0%, #effbff 52%, #fff3da 100%);
+          radial-gradient(circle at 82% 20%, rgba(84, 199, 178, .16), transparent 26%),
+          linear-gradient(180deg, #effcf8 0%, #fff9ed 100%);
       }
 
       .nav {
@@ -1282,22 +1227,7 @@
       .brand-mark {
         width: 40px;
         height: 40px;
-        border-radius: 12px;
-      }
-
-      .brand-kicker,
-      .hero-tagline {
-        display: none;
-      }
-
-      .mascot-strip {
-        grid-template-columns: 56px minmax(0, 1fr);
-        width: 100%;
-      }
-
-      .mascot-strip img {
-        width: 56px;
-        height: 56px;
+        border-radius: 50%;
       }
 
       .lead {
@@ -1395,16 +1325,7 @@
 
     <div class="hero-inner">
       <div class="hero-copy">
-        <span class="brand-kicker" data-i18n="brandKicker">AI-powered travel planning</span>
         <h1 data-i18n="heroTitle">Dit is de leukste plek om elkaar te ontmoeten.</h1>
-        <p class="hero-tagline" data-i18n="heroTagline">Find the perfect trip together with friends and families.</p>
-        <div class="mascot-strip" aria-hidden="true">
-          <img src="/apple-touch-icon.png" alt="">
-          <div>
-            <strong>Alpaica</strong>
-            <span data-i18n="mascotLine">Beachy, smart and built for group trips.</span>
-          </div>
-        </div>
       </div>
 
       <form class="search-panel" id="zoek">
@@ -1510,7 +1431,7 @@
           <section class="form-step" aria-labelledby="step-budget">
             <h2 class="step-title" id="step-budget"><span><span class="step-number">4</span> Budget en sfeer</span></h2>
             <div class="slider-field">
-              <div class="slider-label"><span>Maximaal budget per persoon</span><strong id="tripBudgetValue">â‚¬420</strong></div>
+              <div class="slider-label"><span>Maximaal budget per persoon</span><strong id="tripBudgetValue">€420</strong></div>
               <input id="tripBudget" type="range" min="120" max="1200" step="20" value="420">
             </div>
             <div class="slider-field">
@@ -1555,7 +1476,7 @@
                   <span class="suggestions" role="listbox"></span>
                 </span>
               </label>
-              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">âˆ’</button>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
             </div>
             <div class="person">
               <label>Naam
@@ -1563,11 +1484,11 @@
               </label>
               <label>Vertrek
                 <span class="autocomplete-field">
-                  <input class="departure-input" value="ZÃ¼rich" aria-label="Vertrekplaats deelnemer 2" autocomplete="off">
+                  <input class="departure-input" value="Zürich" aria-label="Vertrekplaats deelnemer 2" autocomplete="off">
                   <span class="suggestions" role="listbox"></span>
                 </span>
               </label>
-              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">âˆ’</button>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
             </div>
             <div class="person">
               <label>Naam
@@ -1579,7 +1500,7 @@
                   <span class="suggestions" role="listbox"></span>
                 </span>
               </label>
-              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">âˆ’</button>
+              <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
             </div>
           </div>
 
@@ -1641,7 +1562,7 @@
           </div>
           <label>Max. budget per persoon
             <input id="budget" type="range" min="120" max="900" value="420">
-            <span class="range-row"><span>â‚¬120</span><strong id="budgetValue">â‚¬420</strong><span>â‚¬900</span></span>
+            <span class="range-row"><span>€120</span><strong id="budgetValue">€420</strong><span>€900</span></span>
           </label>
           <label>Reismix
             <select>
@@ -1662,7 +1583,7 @@
               <div class="chips">
                 <span class="chip">3 directe routes</span>
                 <span class="chip">Gem. 4u 15m reistijd</span>
-                <span class="chip">Hotels vanaf â‚¬138</span>
+                <span class="chip">Hotels vanaf €138</span>
               </div>
             </div>
           </article>
@@ -1680,17 +1601,17 @@
 
       <div class="insights">
         <article class="insight">
-          <div class="insight-icon">â†”</div>
+          <div class="insight-icon">↔</div>
           <h3>Eerlijke reistijd</h3>
-          <p>De tool straft opties af waarbij Ã©Ã©n persoon extreem lang onderweg is, ook als de gemiddelde reistijd goed lijkt.</p>
+          <p>De tool straft opties af waarbij één persoon extreem lang onderweg is, ook als de gemiddelde reistijd goed lijkt.</p>
         </article>
         <article class="insight">
-          <div class="insight-icon">â—·</div>
+          <div class="insight-icon">◷</div>
           <h3>Slimme aankomst</h3>
           <p>Resultaten krijgen een hogere score als iedereen ongeveer rond hetzelfde moment kan aankomen.</p>
         </article>
         <article class="insight">
-          <div class="insight-icon">â‚¬</div>
+          <div class="insight-icon">€</div>
           <h3>Totaalprijs</h3>
           <p>Niet alleen de vlucht, maar ook bagage, trein naar centrum, hotelprijs en beschikbaarheid tellen mee.</p>
         </article>
@@ -1799,36 +1720,36 @@
       scoreWeights: { wishes: 45, budget: 22, stay: 14, route: 14, diversity: 5 }
     }));
     const cities = [
-      { name: "Barcelona", score: 86, route: "Directe vluchten + goede treinen naar centrum", time: "4u 15m", price: 312, hotel: "â‚¬138", changes: "0-1", arrival: "18:20" },
-      { name: "Milaan", score: 81, route: "Sterke treinopties en betaalbare hotels", time: "5u 05m", price: 286, hotel: "â‚¬122", changes: "1", arrival: "17:45" },
-      { name: "Lissabon", score: 78, route: "Iets langer reizen, maar goede weekendwaarde", time: "5u 50m", price: 344, hotel: "â‚¬116", changes: "0-1", arrival: "19:10" },
-      { name: "Kopenhagen", score: 73, route: "Erg comfortabel, maar hotels drukken de score", time: "4u 35m", price: 398, hotel: "â‚¬172", changes: "0-1", arrival: "18:55" }
+      { name: "Barcelona", score: 86, route: "Directe vluchten + goede treinen naar centrum", time: "4u 15m", price: 312, hotel: "€138", changes: "0-1", arrival: "18:20" },
+      { name: "Milaan", score: 81, route: "Sterke treinopties en betaalbare hotels", time: "5u 05m", price: 286, hotel: "€122", changes: "1", arrival: "17:45" },
+      { name: "Lissabon", score: 78, route: "Iets langer reizen, maar goede weekendwaarde", time: "5u 50m", price: 344, hotel: "€116", changes: "0-1", arrival: "19:10" },
+      { name: "Kopenhagen", score: 73, route: "Erg comfortabel, maar hotels drukken de score", time: "4u 35m", price: 398, hotel: "€172", changes: "0-1", arrival: "18:55" }
     ];
 
     const fallbackMajorCities = [
       ["Amsterdam", "Nederland"], ["Rotterdam", "Nederland"], ["Den Haag", "Nederland"], ["Utrecht", "Nederland"], ["Eindhoven", "Nederland"], ["Groningen", "Nederland"], ["Maastricht", "Nederland"],
-      ["Brussel", "BelgiÃ«"], ["Antwerpen", "BelgiÃ«"], ["Gent", "BelgiÃ«"], ["Brugge", "BelgiÃ«"], ["Luik", "BelgiÃ«"],
-      ["ZÃ¼rich", "Zwitserland"], ["GenÃ¨ve", "Zwitserland"], ["Basel", "Zwitserland"], ["Bern", "Zwitserland"], ["Lausanne", "Zwitserland"], ["Lugano", "Zwitserland"],
-      ["Berlin", "Duitsland"], ["Hamburg", "Duitsland"], ["MÃ¼nchen", "Duitsland"], ["KÃ¶ln", "Duitsland"], ["Frankfurt", "Duitsland"], ["DÃ¼sseldorf", "Duitsland"], ["Stuttgart", "Duitsland"], ["Dortmund", "Duitsland"], ["Leipzig", "Duitsland"], ["Hannover", "Duitsland"], ["NÃ¼rnberg", "Duitsland"], ["Bremen", "Duitsland"],
+      ["Brussel", "België"], ["Antwerpen", "België"], ["Gent", "België"], ["Brugge", "België"], ["Luik", "België"],
+      ["Zürich", "Zwitserland"], ["Genève", "Zwitserland"], ["Basel", "Zwitserland"], ["Bern", "Zwitserland"], ["Lausanne", "Zwitserland"], ["Lugano", "Zwitserland"],
+      ["Berlin", "Duitsland"], ["Hamburg", "Duitsland"], ["München", "Duitsland"], ["Köln", "Duitsland"], ["Frankfurt", "Duitsland"], ["Düsseldorf", "Duitsland"], ["Stuttgart", "Duitsland"], ["Dortmund", "Duitsland"], ["Leipzig", "Duitsland"], ["Hannover", "Duitsland"], ["Nürnberg", "Duitsland"], ["Bremen", "Duitsland"],
       ["Paris", "Frankrijk"], ["Lyon", "Frankrijk"], ["Marseille", "Frankrijk"], ["Nice", "Frankrijk"], ["Toulouse", "Frankrijk"], ["Bordeaux", "Frankrijk"], ["Lille", "Frankrijk"], ["Nantes", "Frankrijk"], ["Strasbourg", "Frankrijk"], ["Montpellier", "Frankrijk"],
       ["London", "Verenigd Koninkrijk"], ["Manchester", "Verenigd Koninkrijk"], ["Birmingham", "Verenigd Koninkrijk"], ["Liverpool", "Verenigd Koninkrijk"], ["Edinburgh", "Verenigd Koninkrijk"], ["Glasgow", "Verenigd Koninkrijk"], ["Bristol", "Verenigd Koninkrijk"], ["Leeds", "Verenigd Koninkrijk"],
       ["Dublin", "Ierland"], ["Cork", "Ierland"], ["Belfast", "Verenigd Koninkrijk"],
-      ["Madrid", "Spanje"], ["Barcelona", "Spanje"], ["Valencia", "Spanje"], ["Sevilla", "Spanje"], ["Bilbao", "Spanje"], ["MÃ¡laga", "Spanje"], ["Alicante", "Spanje"], ["Palma de Mallorca", "Spanje"],
+      ["Madrid", "Spanje"], ["Barcelona", "Spanje"], ["Valencia", "Spanje"], ["Sevilla", "Spanje"], ["Bilbao", "Spanje"], ["Málaga", "Spanje"], ["Alicante", "Spanje"], ["Palma de Mallorca", "Spanje"],
       ["Lisbon", "Portugal"], ["Porto", "Portugal"], ["Faro", "Portugal"],
-      ["Rome", "ItaliÃ«"], ["Milan", "ItaliÃ«"], ["Venice", "ItaliÃ«"], ["Florence", "ItaliÃ«"], ["Naples", "ItaliÃ«"], ["Bologna", "ItaliÃ«"], ["Turin", "ItaliÃ«"], ["Palermo", "ItaliÃ«"], ["Catania", "ItaliÃ«"],
+      ["Rome", "Italië"], ["Milan", "Italië"], ["Venice", "Italië"], ["Florence", "Italië"], ["Naples", "Italië"], ["Bologna", "Italië"], ["Turin", "Italië"], ["Palermo", "Italië"], ["Catania", "Italië"],
       ["Vienna", "Oostenrijk"], ["Salzburg", "Oostenrijk"], ["Innsbruck", "Oostenrijk"], ["Graz", "Oostenrijk"],
-      ["Copenhagen", "Denemarken"], ["Aarhus", "Denemarken"], ["Stockholm", "Zweden"], ["Gothenburg", "Zweden"], ["MalmÃ¶", "Zweden"], ["Oslo", "Noorwegen"], ["Bergen", "Noorwegen"], ["Helsinki", "Finland"], ["Tampere", "Finland"], ["Reykjavik", "IJsland"],
-      ["Warsaw", "Polen"], ["KrakÃ³w", "Polen"], ["GdaÅ„sk", "Polen"], ["WrocÅ‚aw", "Polen"], ["PoznaÅ„", "Polen"],
-      ["Prague", "TsjechiÃ«"], ["Brno", "TsjechiÃ«"], ["Budapest", "Hongarije"], ["Debrecen", "Hongarije"], ["Bratislava", "Slowakije"],
-      ["Ljubljana", "SloveniÃ«"], ["Zagreb", "KroatiÃ«"], ["Split", "KroatiÃ«"], ["Dubrovnik", "KroatiÃ«"], ["Belgrade", "ServiÃ«"], ["Sarajevo", "BosniÃ« en Herzegovina"],
+      ["Copenhagen", "Denemarken"], ["Aarhus", "Denemarken"], ["Stockholm", "Zweden"], ["Gothenburg", "Zweden"], ["Malmö", "Zweden"], ["Oslo", "Noorwegen"], ["Bergen", "Noorwegen"], ["Helsinki", "Finland"], ["Tampere", "Finland"], ["Reykjavik", "IJsland"],
+      ["Warsaw", "Polen"], ["Kraków", "Polen"], ["Gdańsk", "Polen"], ["Wrocław", "Polen"], ["Poznań", "Polen"],
+      ["Prague", "Tsjechië"], ["Brno", "Tsjechië"], ["Budapest", "Hongarije"], ["Debrecen", "Hongarije"], ["Bratislava", "Slowakije"],
+      ["Ljubljana", "Slovenië"], ["Zagreb", "Kroatië"], ["Split", "Kroatië"], ["Dubrovnik", "Kroatië"], ["Belgrade", "Servië"], ["Sarajevo", "Bosnië en Herzegovina"],
       ["Athens", "Griekenland"], ["Thessaloniki", "Griekenland"], ["Istanbul", "Turkije"], ["Ankara", "Turkije"], ["Izmir", "Turkije"], ["Antalya", "Turkije"],
-      ["Bucharest", "RoemeniÃ«"], ["Sofia", "Bulgarije"], ["Riga", "Letland"], ["Tallinn", "Estland"], ["Vilnius", "Litouwen"],
+      ["Bucharest", "Roemenië"], ["Sofia", "Bulgarije"], ["Riga", "Letland"], ["Tallinn", "Estland"], ["Vilnius", "Litouwen"],
       ["New York", "Verenigde Staten"], ["Los Angeles", "Verenigde Staten"], ["Chicago", "Verenigde Staten"], ["San Francisco", "Verenigde Staten"], ["Miami", "Verenigde Staten"], ["Boston", "Verenigde Staten"], ["Washington DC", "Verenigde Staten"], ["Seattle", "Verenigde Staten"], ["Las Vegas", "Verenigde Staten"],
       ["Toronto", "Canada"], ["Vancouver", "Canada"], ["Montreal", "Canada"], ["Calgary", "Canada"],
-      ["Mexico City", "Mexico"], ["CancÃºn", "Mexico"], ["Guadalajara", "Mexico"], ["SÃ£o Paulo", "BraziliÃ«"], ["Rio de Janeiro", "BraziliÃ«"], ["Buenos Aires", "ArgentiniÃ«"], ["Santiago", "Chili"], ["Lima", "Peru"], ["BogotÃ¡", "Colombia"],
-      ["Dubai", "Verenigde Arabische Emiraten"], ["Abu Dhabi", "Verenigde Arabische Emiraten"], ["Doha", "Qatar"], ["Tel Aviv", "IsraÃ«l"], ["Cairo", "Egypte"], ["Marrakesh", "Marokko"], ["Casablanca", "Marokko"], ["Cape Town", "Zuid-Afrika"], ["Johannesburg", "Zuid-Afrika"],
-      ["Tokyo", "Japan"], ["Osaka", "Japan"], ["Kyoto", "Japan"], ["Seoul", "Zuid-Korea"], ["Singapore", "Singapore"], ["Bangkok", "Thailand"], ["Kuala Lumpur", "MaleisiÃ«"], ["Hong Kong", "Hongkong"], ["Shanghai", "China"], ["Beijing", "China"], ["Taipei", "Taiwan"], ["Mumbai", "India"], ["Delhi", "India"], ["Bengaluru", "India"],
-      ["Sydney", "AustraliÃ«"], ["Melbourne", "AustraliÃ«"], ["Brisbane", "AustraliÃ«"], ["Auckland", "Nieuw-Zeeland"]
+      ["Mexico City", "Mexico"], ["Cancún", "Mexico"], ["Guadalajara", "Mexico"], ["São Paulo", "Brazilië"], ["Rio de Janeiro", "Brazilië"], ["Buenos Aires", "Argentinië"], ["Santiago", "Chili"], ["Lima", "Peru"], ["Bogotá", "Colombia"],
+      ["Dubai", "Verenigde Arabische Emiraten"], ["Abu Dhabi", "Verenigde Arabische Emiraten"], ["Doha", "Qatar"], ["Tel Aviv", "Israël"], ["Cairo", "Egypte"], ["Marrakesh", "Marokko"], ["Casablanca", "Marokko"], ["Cape Town", "Zuid-Afrika"], ["Johannesburg", "Zuid-Afrika"],
+      ["Tokyo", "Japan"], ["Osaka", "Japan"], ["Kyoto", "Japan"], ["Seoul", "Zuid-Korea"], ["Singapore", "Singapore"], ["Bangkok", "Thailand"], ["Kuala Lumpur", "Maleisië"], ["Hong Kong", "Hongkong"], ["Shanghai", "China"], ["Beijing", "China"], ["Taipei", "Taiwan"], ["Mumbai", "India"], ["Delhi", "India"], ["Bengaluru", "India"],
+      ["Sydney", "Australië"], ["Melbourne", "Australië"], ["Brisbane", "Australië"], ["Auckland", "Nieuw-Zeeland"]
     ].map(([city, country]) => ({ city, country }));
     const majorCities = window.meetwayEuropeCities?.length ? window.meetwayEuropeCities : fallbackMajorCities;
 
@@ -1844,15 +1765,12 @@
     const serverWarning = document.querySelector("#serverWarning");
     const liveApiStatus = document.querySelector("#liveApiStatus");
     const liveFlightsByDestination = new Map();
-    const popularCities = ["Amsterdam", "ZÃ¼rich", "London", "Paris", "Barcelona", "Berlin"].map((city) => majorCities.find((item) => item.city === city)).filter(Boolean);
+    const popularCities = ["Amsterdam", "Zürich", "London", "Paris", "Barcelona", "Berlin"].map((city) => majorCities.find((item) => item.city === city)).filter(Boolean);
 
     const i18n = {
       nl: {
         title: "Alpaica - beste ontmoetingsplek vinden",
         heroTitle: "Dit is de leukste plek om elkaar te ontmoeten.",
-        brandKicker: "AI-reisplanning voor groepen",
-        heroTagline: "Vind samen de perfecte trip voor vrienden en families.",
-        mascotLine: "Zonnig, slim en gemaakt voor groepsreizen.",
         navSearch: "Zoeken", navResults: "Resultaten", navHow: "Hoe het werkt",
         stepPeople: "Wie reist mee?", stepFlight: "Wanneer en hoe vliegen?", stepStay: "Waar willen jullie slapen?", stepBudget: "Budget en sfeer",
         name: "Naam", homeCity: "Woonplaats", addTraveler: "+ Reiziger toevoegen",
@@ -1869,30 +1787,24 @@
       },
       de: {
         title: "Alpaica - den besten Treffpunkt finden",
-        heroTitle: "Das ist der schÃ¶nste Ort, um sich zu treffen.",
-        brandKicker: "KI-Reiseplanung fÃ¼r Gruppen",
-        heroTagline: "Findet gemeinsam den perfekten Trip fÃ¼r Freunde und Familien.",
-        mascotLine: "Sonnig, smart und gemacht fÃ¼r Gruppenreisen.",
+        heroTitle: "Das ist der schönste Ort, um sich zu treffen.",
         navSearch: "Suchen", navResults: "Ergebnisse", navHow: "So funktioniert es",
         stepPeople: "Wer reist mit?", stepFlight: "Wann und wie fliegen?", stepStay: "Wo wollt ihr schlafen?", stepBudget: "Budget und Stimmung",
-        name: "Name", homeCity: "Wohnort", addTraveler: "+ Reisende hinzufÃ¼gen",
-        arrivalDate: "Anreisetag", returnDate: "RÃ¼ckreisetag", outFrom: "Hinflug ab", outTo: "Hinflug bis", backFrom: "RÃ¼ckflug ab", backTo: "RÃ¼ckflug bis",
-        directOnly: "Nur DirektflÃ¼ge", noEarly: "Keine sehr frÃ¼hen FlÃ¼ge",
+        name: "Name", homeCity: "Wohnort", addTraveler: "+ Reisende hinzufügen",
+        arrivalDate: "Anreisetag", returnDate: "Rückreisetag", outFrom: "Hinflug ab", outTo: "Hinflug bis", backFrom: "Rückflug ab", backTo: "Rückflug bis",
+        directOnly: "Nur Direktflüge", noEarly: "Keine sehr frühen Flüge",
         anyStay: "Egal", hotel: "Hotel", apartment: "Apartment", hostel: "Hostel",
-        luxury: "Komfortniveau", roomType: "Zimmeraufteilung", budget: "Maximales Budget pro Person", comfort: "Wie wichtig ist die UnterkunftsqualitÃ¤t?", wishes: "Was soll der Ort bieten?",
-        luxuryOptions: ["Einfach gut", "3 Sterne oder hÃ¶her", "4 Sterne oder hÃ¶her", "So komfortabel wie mÃ¶glich"],
+        luxury: "Komfortniveau", roomType: "Zimmeraufteilung", budget: "Maximales Budget pro Person", comfort: "Wie wichtig ist die Unterkunftsqualität?", wishes: "Was soll der Ort bieten?",
+        luxuryOptions: ["Einfach gut", "3 Sterne oder höher", "4 Sterne oder höher", "So komfortabel wie möglich"],
         roomOptions: ["Egal", "Alle ein eigenes Zimmer", "Zwei Einzelbetten", "Doppelzimmer", "Mehrere Zimmer"],
-        mixOptions: ["Flug + Zug + Auto", "Nur Zug", "Nur Flug", "Keine NachtflÃ¼ge"],
-        searchButton: "Beste Orte suchen", bestMatch: "Beste Ãœbereinstimmung", lowestPrice: "Niedrigster Preis",
-        resultsTitle: "Ergebnisse", resultsIntro: "Die beste Ãœbereinstimmung steht oben. Tippe auf FlÃ¼ge oder Unterkunft fÃ¼r Details.",
-        travelers: "Reisende", from: "Abreise aus", liveLoading: "Echte Flugpreise werden Ã¼ber SerpApi geladen...", liveLoaded: "Live-Flugpreise geladen Ã¼ber", localFallback: "Die lokale MVP-SchÃ¤tzung bleibt sichtbar. Ã–ffne die Website Ã¼ber http://localhost:4180, falls du noch file:// nutzt."
+        mixOptions: ["Flug + Zug + Auto", "Nur Zug", "Nur Flug", "Keine Nachtflüge"],
+        searchButton: "Beste Orte suchen", bestMatch: "Beste Übereinstimmung", lowestPrice: "Niedrigster Preis",
+        resultsTitle: "Ergebnisse", resultsIntro: "Die beste Übereinstimmung steht oben. Tippe auf Flüge oder Unterkunft für Details.",
+        travelers: "Reisende", from: "Abreise aus", liveLoading: "Echte Flugpreise werden über SerpApi geladen...", liveLoaded: "Live-Flugpreise geladen über", localFallback: "Die lokale MVP-Schätzung bleibt sichtbar. Öffne die Website über http://localhost:4180, falls du noch file:// nutzt."
       },
       en: {
         title: "Alpaica - find the best place to meet",
         heroTitle: "This is the most fun place to meet.",
-        brandKicker: "AI-powered travel planning",
-        heroTagline: "Find the perfect trip together with friends and families.",
-        mascotLine: "Beachy, smart and built for group trips.",
         navSearch: "Search", navResults: "Results", navHow: "How it works",
         stepPeople: "Who is travelling?", stepFlight: "When and how to fly?", stepStay: "Where do you want to stay?", stepBudget: "Budget and vibe",
         name: "Name", homeCity: "Home city", addTraveler: "+ Add traveller",
@@ -1959,9 +1871,6 @@
       document.documentElement.lang = activeLocale;
       document.title = tr("title");
       document.querySelector("[data-i18n='heroTitle']").textContent = tr("heroTitle");
-      document.querySelector("[data-i18n='brandKicker']").textContent = tr("brandKicker");
-      document.querySelector("[data-i18n='heroTagline']").textContent = tr("heroTagline");
-      document.querySelector("[data-i18n='mascotLine']").textContent = tr("mascotLine");
       const navLinks = document.querySelectorAll(".nav a");
       if (navLinks[0]) navLinks[0].textContent = tr("navSearch");
       if (navLinks[1]) navLinks[1].textContent = tr("navResults");
@@ -1999,7 +1908,7 @@
       if (location.protocol === "file:") {
         serverWarning.hidden = false;
         serverWarning.innerHTML = activeLocale === "de"
-          ? 'Live-FlÃ¼ge funktionieren nur Ã¼ber <strong>http://localhost:4180/index.html</strong>, nicht Ã¼ber diese file:// Ansicht.'
+          ? 'Live-Flüge funktionieren nur über <strong>http://localhost:4180/index.html</strong>, nicht über diese file:// Ansicht.'
           : activeLocale === "en"
             ? 'Live flights only work via <strong>http://localhost:4180/index.html</strong>, not from this file:// view.'
             : 'Live vluchten werken alleen via <strong>http://localhost:4180/index.html</strong>, niet via deze file:// weergave.';
@@ -2147,7 +2056,7 @@
             <details class="click-detail stay-option" ${index === 0 ? "open" : ""}>
               <summary>
                 <span>${stay.fit}: ${stay.name}</span>
-                <span>â‚¬${stay.price} p.p.</span>
+                <span>€${stay.price} p.p.</span>
               </summary>
               <div class="detail-body">
                 <div class="stay-content">
@@ -2185,8 +2094,8 @@
           ${city.flights.map((flight, index) => `
             <details class="click-detail traveler-flight" ${index === 0 ? "open" : ""}>
               <summary>
-                <span>${flight.traveler}: ${flight.origin} â†’ ${flight.destination}</span>
-                <span>â‚¬${flight.price || "?"}</span>
+                <span>${flight.traveler}: ${flight.origin} → ${flight.destination}</span>
+                <span>€${flight.price || "?"}</span>
               </summary>
               <div class="detail-body">
                 <span class="provider-pill">${flight.source || "MVP vluchtdata"}</span>
@@ -2195,9 +2104,9 @@
                 <div class="detail-row"><b>Airline</b><span>${flight.airline || "Nog niet bekend"}</span></div>
                 <div class="detail-row"><b>Route</b><span>${flight.origin} naar ${flight.destination}</span></div>
                 <div class="detail-row"><b>Overstappen</b><span>${flight.stops === 0 ? "Direct" : `${flight.stops || 0} overstap${flight.stops > 1 ? "pen" : ""}`}</span></div>
-                <div class="detail-row"><b>Prijs</b><span>â‚¬${flight.price || "?"} vlucht p.p.</span></div>
+                <div class="detail-row"><b>Prijs</b><span>€${flight.price || "?"} vlucht p.p.</span></div>
                 ${(flight.segments || []).map((segment) => `
-                  <div class="detail-row"><b>Segment</b><span>${segment.departureAirport || flight.origin} ${segment.departureTime || ""} â†’ ${segment.arrivalAirport || flight.destination} ${segment.arrivalTime || ""}${segment.flightNumber ? ` Â· ${segment.flightNumber}` : ""}</span></div>
+                  <div class="detail-row"><b>Segment</b><span>${segment.departureAirport || flight.origin} ${segment.departureTime || ""} → ${segment.arrivalAirport || flight.destination} ${segment.arrivalTime || ""}${segment.flightNumber ? ` · ${segment.flightNumber}` : ""}</span></div>
                 `).join("")}
               </div>
             </details>
@@ -2297,12 +2206,12 @@
       const direct = document.querySelector("#directOnly").checked ? "alleen directe vluchten" : "directe vluchten mogen, overstappen ook";
       const wishes = document.querySelector("#wishText").value.trim();
 
-      tripBudgetValue.textContent = `â‚¬${tripBudget.value}`;
+      tripBudgetValue.textContent = `€${tripBudget.value}`;
       comfortValue.textContent = `${comfort.value}/10`;
       tripSummary.innerHTML = `
         <strong>${travelers.length} reizigers: ${names}</strong>
         <span>Vertrek vanuit ${cities}. Heen ${document.querySelector("#arrivalDate").value || "datum open"} tussen ${minutesToTime(document.querySelector("#outFrom").value)} en ${minutesToTime(document.querySelector("#outTo").value)}; terug tussen ${minutesToTime(document.querySelector("#backFrom").value)} en ${minutesToTime(document.querySelector("#backTo").value)}.</span>
-        <span>${direct}. Verblijf: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. Budget: â‚¬${tripBudget.value} p.p.</span>
+        <span>${direct}. Verblijf: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. Budget: €${tripBudget.value} p.p.</span>
         <span>${wishes || "Nog geen vrije wensen ingevuld."}</span>
       `;
     }
@@ -2312,19 +2221,19 @@
       const names = travelers.map((item) => item.name).join(", ");
       const cities = travelers.map((item) => item.city).join(", ");
       const direct = document.querySelector("#directOnly").checked
-        ? (activeLocale === "de" ? "nur DirektflÃ¼ge" : activeLocale === "en" ? "direct flights only" : "alleen directe vluchten")
-        : (activeLocale === "de" ? "DirektflÃ¼ge oder Umstiege mÃ¶glich" : activeLocale === "en" ? "direct flights or stops allowed" : "directe vluchten mogen, overstappen ook");
+        ? (activeLocale === "de" ? "nur Direktflüge" : activeLocale === "en" ? "direct flights only" : "alleen directe vluchten")
+        : (activeLocale === "de" ? "Direktflüge oder Umstiege möglich" : activeLocale === "en" ? "direct flights or stops allowed" : "directe vluchten mogen, overstappen ook");
       const stayLabel = activeLocale === "de" ? "Unterkunft" : activeLocale === "en" ? "Stay" : "Verblijf";
       const budgetLabel = activeLocale === "de" ? "Budget" : activeLocale === "en" ? "Budget" : "Budget";
-      const noWishes = activeLocale === "de" ? "Noch keine freien WÃ¼nsche eingetragen." : activeLocale === "en" ? "No free-form wishes added yet." : "Nog geen vrije wensen ingevuld.";
+      const noWishes = activeLocale === "de" ? "Noch keine freien Wünsche eingetragen." : activeLocale === "en" ? "No free-form wishes added yet." : "Nog geen vrije wensen ingevuld.";
       const wishes = document.querySelector("#wishText").value.trim();
 
-      tripBudgetValue.textContent = `â‚¬${tripBudget.value}`;
+      tripBudgetValue.textContent = `€${tripBudget.value}`;
       comfortValue.textContent = `${comfort.value}/10`;
       tripSummary.innerHTML = `
         <strong>${travelers.length} ${tr("travelers")}: ${names}</strong>
         <span>${tr("from")} ${cities}. ${tr("outFrom")} ${document.querySelector("#arrivalDate").value || ""} ${minutesToTime(document.querySelector("#outFrom").value)}-${minutesToTime(document.querySelector("#outTo").value)}; ${tr("backFrom").toLowerCase()} ${minutesToTime(document.querySelector("#backFrom").value)}-${minutesToTime(document.querySelector("#backTo").value)}.</span>
-        <span>${direct}. ${stayLabel}: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. ${budgetLabel}: â‚¬${tripBudget.value} p.p.</span>
+        <span>${direct}. ${stayLabel}: ${selectedStayType().toLowerCase()}, ${document.querySelector("#luxury").value.toLowerCase()}, ${document.querySelector("#roomType").value.toLowerCase()}. ${budgetLabel}: €${tripBudget.value} p.p.</span>
         <span>${wishes || noWishes}</span>
       `;
     };
@@ -2453,18 +2362,18 @@
           <div class="flight-legs">
             ${offer.itineraries.map((leg, index) => `
               <div class="flight-leg">
-                <div class="flight-route">${index === 0 ? "Heen" : "Terug"}: ${leg.from} â†’ ${leg.to}</div>
+                <div class="flight-route">${index === 0 ? "Heen" : "Terug"}: ${leg.from} → ${leg.to}</div>
                 <div>
-                  <strong>${formatFlightDate(leg.departure)} â€“ ${formatFlightDate(leg.arrival)}</strong>
-                  <div class="flight-detail">${leg.carrier || "Luchtvaartmaatschappij"}${leg.flightNumber ? ` Â· ${leg.flightNumber}` : ""}</div>
+                  <strong>${formatFlightDate(leg.departure)} – ${formatFlightDate(leg.arrival)}</strong>
+                  <div class="flight-detail">${leg.carrier || "Luchtvaartmaatschappij"}${leg.flightNumber ? ` · ${leg.flightNumber}` : ""}</div>
                 </div>
-                <div class="flight-detail">${formatDuration(leg.duration)} Â· ${leg.stops === 0 ? "direct" : `${leg.stops} overstap${leg.stops > 1 ? "pen" : ""}`}</div>
+                <div class="flight-detail">${formatDuration(leg.duration)} · ${leg.stops === 0 ? "direct" : `${leg.stops} overstap${leg.stops > 1 ? "pen" : ""}`}</div>
               </div>
             `).join("")}
           </div>
           <div class="flight-price">
             <strong>${new Intl.NumberFormat("nl-NL", { style: "currency", currency: offer.currency }).format(offer.price)}</strong>
-            <span class="flight-detail">totaal Â· via ${payload.provider}</span>
+            <span class="flight-detail">totaal · via ${payload.provider}</span>
           </div>
         </article>
       `).join("");
@@ -2549,7 +2458,7 @@
               </div>
             </div>
             <div class="price">
-              <b>â‚¬${city.price}</b>
+              <b>€${city.price}</b>
               <span>vanaf p.p.</span>
             </div>
           </article>
@@ -2595,24 +2504,24 @@
               <div class="metric"><b>${city.time}</b><span>gem. reistijd</span></div>
               <div class="metric"><b>${city.direct}</b><span>directe routes</span></div>
               <div class="metric"><b>${city.arrival}</b><span>gezamenlijk aankomen</span></div>
-              <div class="metric"><b>â‚¬${city.hotel}</b><span>verblijf p.p.</span></div>
+              <div class="metric"><b>€${city.hotel}</b><span>verblijf p.p.</span></div>
             </div>
             <div class="chips">
               ${city.tags.slice(0, 4).map((tag) => `<span class="chip">${tag}</span>`).join("")}
             </div>
           </div>
           <div class="price">
-            <b>â‚¬${city.price}</b>
+            <b>€${city.price}</b>
             <span>gem. vlucht + verblijf p.p.</span>
           </div>
           <div class="flight-breakdown">
             <h4>Vluchten per reiziger</h4>
             ${city.flights.map((flight) => `
               <div class="traveler-flight">
-                <div><b>${flight.traveler}</b><span>${flight.origin} â†’ ${flight.destination}</span></div>
+                <div><b>${flight.traveler}</b><span>${flight.origin} → ${flight.destination}</span></div>
                 <div><b>Heen ${flight.outbound}</b><span>${flight.airline}</span></div>
                 <div><b>Terug ${flight.inbound}</b><span>directe/lichte route</span></div>
-                <div><b>â‚¬${flight.price}</b><span>vlucht</span></div>
+                <div><b>€${flight.price}</b><span>vlucht</span></div>
               </div>
             `).join("")}
           </div>
@@ -2662,14 +2571,14 @@
               <div class="metric"><b>${city.time}</b><span>gem. reistijd</span></div>
               <div class="metric"><b>${city.direct}</b><span>directe routes</span></div>
               <div class="metric"><b>${city.arrival}</b><span>gezamenlijk aankomen</span></div>
-              <div class="metric"><b>â‚¬${city.hotel}</b><span>verblijf p.p.</span></div>
+              <div class="metric"><b>€${city.hotel}</b><span>verblijf p.p.</span></div>
             </div>
             <div class="chips">
               ${city.tags.slice(0, 4).map((tag) => `<span class="chip">${tag}</span>`).join("")}
             </div>
           </div>
           <div class="price">
-            <b>â‚¬${city.price}</b>
+            <b>€${city.price}</b>
             <span>gem. vlucht + verblijf p.p.</span>
           </div>
           ${renderFlightOptions(city)}
@@ -2794,7 +2703,7 @@
             arrivalAirport: flight.arrivalAirport || flight.destination,
             flightDuration: flight.flightDuration || flight.duration || 0,
             totalTravelDuration: flight.totalTravelDuration || flight.duration || 0,
-            isDirect: flight.isDirect ?? Number(flight.stops || 0) === 0,
+            isDirect: typeof flight.isDirect === "boolean" ? flight.isDirect : Number(flight.stops || 0) === 0,
             sourceType: "live"
           }))
           .filter((flight) => selectedAirportCodes.size === 0 || (selectedAirportCodes.has(flight.departureAirport) && selectedAirportCodes.has(flight.arrivalAirport)))
@@ -3037,7 +2946,7 @@
             <span class="suggestions" role="listbox"></span>
           </span>
         </label>
-        <button class="icon-button" type="button" aria-label="Verwijder deelnemer">âˆ’</button>
+        <button class="icon-button" type="button" aria-label="Verwijder deelnemer">−</button>
       `;
       people.appendChild(row);
       setupAutocomplete(row);
@@ -3086,7 +2995,7 @@
     });
 
     budget.addEventListener("input", () => {
-      budgetValue.textContent = `â‚¬${budget.value}`;
+      budgetValue.textContent = `€${budget.value}`;
       tripBudget.value = budget.value;
       updateTripSummary();
       renderCities();
@@ -3128,7 +3037,7 @@
     });
     tripBudget.addEventListener("input", () => {
       budget.value = Math.min(Number(budget.max), Number(tripBudget.value));
-      budgetValue.textContent = `â‚¬${budget.value}`;
+      budgetValue.textContent = `€${budget.value}`;
       renderCities();
     });
     setDefaultFlightDates();
