@@ -39,7 +39,7 @@ Als GitHub Actions meldt `getaddrinfo ENOTFOUND *** (control socket)`, dan is `H
 
 ## Wat wordt online gezet
 
-De workflow uploadt de inhoud van `outputs/` naar de webroot. Door `local-dir: ./outputs/` uploadt hij dus niet de map `outputs` zelf, maar de bestanden erin.
+De workflow kopieert de publieke bestanden eerst naar `deploy-root/` en uploadt daarna de inhoud van die map naar de webroot. Daardoor kan de map `outputs/` niet mee naar Hostinger.
 
 Deze bestanden komen online:
 
@@ -49,7 +49,13 @@ Deze bestanden komen online:
 
 De lokale backend `outputs/server.js`, `.env`, `.env.example` en `STARTEN.md` worden uitgesloten in deze statische deploy.
 
-Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow of upload je via een ander proces. Push deze workflowwijziging opnieuw en verwijder daarna de foutieve map `public_html/outputs/` in Hostinger File Manager.
+Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow, staat `HOSTINGER_FTP_TARGET_DIR` nog op een pad met `/outputs/`, of upload je via een ander proces. Push deze workflowwijziging opnieuw en verwijder daarna de foutieve map `public_html/outputs/` in Hostinger File Manager.
+
+In de GitHub Actions-log moet je bij `Prepare webroot files` deze regels zien:
+
+- `deploy-root/index.html`
+- `deploy-root/europe-cities.js`
+- `deploy-root/meetway-hero.png`
 
 ## Later: echte API/backend
 

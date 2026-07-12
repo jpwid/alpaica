@@ -15,6 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare webroot files
+        run: |
+          rm -rf deploy-root
+          mkdir -p deploy-root
+          cp outputs/index.html deploy-root/index.html
+          cp outputs/europe-cities.js deploy-root/europe-cities.js
+          cp outputs/meetway-hero.png deploy-root/meetway-hero.png
+          find deploy-root -maxdepth 2 -type f -print
+
       - name: Check Hostinger secrets
         env:
           HOSTINGER_FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
@@ -51,10 +60,5 @@ jobs:
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           protocol: ${{ secrets.HOSTINGER_FTP_PROTOCOL }}
           port: ${{ secrets.HOSTINGER_FTP_PORT }}
-          local-dir: ./outputs/
+          local-dir: ./deploy-root/
           server-dir: ${{ secrets.HOSTINGER_FTP_TARGET_DIR }}
-          exclude: |
-            **/.env
-            **/.env.example
-            **/server.js
-            **/STARTEN.md
