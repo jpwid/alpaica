@@ -44,6 +44,14 @@
 
     * { box-sizing: border-box; }
 
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
+    }
+
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -51,6 +59,11 @@
         linear-gradient(180deg, rgba(236, 252, 248, .88), rgba(255, 247, 232, .68) 520px, #fbfaf6 920px),
         #fbfaf6;
       color: var(--ink);
+    }
+
+    img,
+    svg {
+      max-width: 100%;
     }
 
     button,
@@ -94,6 +107,7 @@
       padding: 18px clamp(18px, 5vw, 56px);
       position: relative;
       z-index: 1;
+      max-width: 100%;
     }
 
     .brand {
@@ -177,6 +191,7 @@
 
     .hero-inner {
       width: min(1180px, calc(100% - 36px));
+      max-width: 100%;
       margin: 0 auto;
       display: grid;
       grid-template-columns: minmax(220px, 360px) minmax(420px, 520px);
@@ -213,11 +228,11 @@
     }
 
     .search-panel {
-      background: rgba(255, 255, 255, .56);
+      background: rgba(255, 255, 255, .72);
       color: var(--ink);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, .72);
-      box-shadow: 0 24px 56px rgba(7, 27, 73, .14);
+      border-radius: 10px;
+      border: 1px solid rgba(199, 232, 239, .86);
+      box-shadow: 0 18px 44px rgba(7, 27, 73, .11);
       padding: 10px;
       backdrop-filter: blur(16px);
     }
@@ -265,12 +280,12 @@
     select,
     textarea {
       width: 100%;
-      min-height: 46px;
+      min-height: 42px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: #fff;
       color: var(--ink);
-      padding: 10px 12px;
+      padding: 9px 11px;
       outline: none;
     }
 
@@ -297,6 +312,18 @@
       grid-template-columns: 1fr 1fr 42px;
       gap: 8px;
       align-items: end;
+      min-width: 0;
+    }
+
+    .person > *,
+    .field-grid > *,
+    .two-col > *,
+    .three-col > *,
+    .time-grid > *,
+    .city-card > *,
+    .metric,
+    .traveler-flight > * {
+      min-width: 0;
     }
 
     .autocomplete-field {
@@ -316,6 +343,9 @@
       background: #fff;
       box-shadow: 0 18px 38px rgba(23, 33, 38, .18);
       padding: 6px;
+      max-height: min(280px, 48vh);
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .suggestions.open {
@@ -325,7 +355,7 @@
 
     .suggestion {
       width: 100%;
-      min-height: 42px;
+      min-height: 38px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -372,10 +402,10 @@
     .form-step {
       display: grid;
       gap: 10px;
-      padding: 12px;
+      padding: 10px;
       border: 1px solid rgba(199, 232, 239, .92);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .86);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
     }
 
     .step-title {
@@ -523,6 +553,7 @@
       font-size: .88rem;
       font-weight: 760;
       cursor: pointer;
+      max-width: 100%;
     }
 
     .check-tile input,
@@ -563,6 +594,40 @@
       color: var(--teal-dark);
       font-size: .86rem;
       line-height: 1.35;
+    }
+
+    .airport-filter {
+      background: #f5fffd;
+      color: var(--ink);
+      border: 1px solid rgba(199, 232, 239, .92);
+    }
+
+    .airport-filter header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .airport-filter small {
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .airport-groups {
+      display: grid;
+      gap: 8px;
+    }
+
+    .airport-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .airport-group-title {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
     }
 
     .server-warning {
@@ -731,6 +796,7 @@
 
     .section {
       width: min(1180px, calc(100% - 36px));
+      max-width: 100%;
       margin: 0 auto;
       padding: 56px 0;
     }
@@ -1030,6 +1096,7 @@
     .metric b {
       display: block;
       font-size: 1rem;
+      overflow-wrap: anywhere;
     }
 
     .metric span {
@@ -1211,8 +1278,19 @@
     }
 
     @media (max-width: 520px) {
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
       .topbar {
         padding: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .language-switch {
+        margin-left: auto;
       }
 
       h1 {
@@ -1236,7 +1314,8 @@
       }
 
       .search-panel {
-        padding: 12px;
+        padding: 8px;
+        border-radius: 12px;
       }
 
       .tabs {
@@ -1265,17 +1344,36 @@
       }
 
       .person {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px;
+        grid-template-columns: minmax(0, 1fr);
         gap: 6px;
       }
 
       .person .icon-button {
         width: 36px;
         height: 42px;
+        justify-self: end;
       }
 
       .city-meta {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .city-card,
+      .score-card,
+      .filters {
+        padding: 12px;
+      }
+
+      .check-tile,
+      .choice-chip {
+        min-height: 36px;
+        padding: 8px 10px;
+        font-size: .82rem;
+      }
+
+      .airport-filter header {
+        display: grid;
+        gap: 2px;
       }
 
       .live-search {
@@ -2266,7 +2364,7 @@
     function chooseSuggestion(input, city) {
       input.value = city;
       closeSuggestions();
-      input.focus();
+      input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     function renderSuggestions(input) {
@@ -2294,7 +2392,15 @@
         input.dataset.autocompleteReady = "true";
 
         input.addEventListener("focus", () => renderSuggestions(input));
-        input.addEventListener("input", () => renderSuggestions(input));
+        input.addEventListener("input", () => {
+          airportFiltersInitialized = false;
+          airportFiltersTouched = false;
+          renderSuggestions(input);
+        });
+        input.addEventListener("change", () => {
+          airportFiltersInitialized = false;
+          airportFiltersTouched = false;
+        });
         input.addEventListener("keydown", (event) => {
           const box = input.closest(".autocomplete-field").querySelector(".suggestions");
           const options = [...box.querySelectorAll(".suggestion")];
@@ -2589,6 +2695,7 @@
 
     let selectedAirportCodes = new Set();
     let airportFiltersInitialized = false;
+    let airportFiltersTouched = false;
 
     const homeAirportMap = {
       amsterdam: ["AMS", "RTM", "EIN"], rotterdam: ["RTM", "AMS"], "den haag": ["RTM", "AMS"], utrecht: ["AMS", "RTM"], eindhoven: ["EIN", "AMS", "BRU"],
@@ -2632,10 +2739,14 @@
       return homeAirportMap[key] || airportAlternatives[cityAirport(city)] || [cityAirport(city)];
     }
 
+    function airportFilterAllows(code) {
+      return (!airportFiltersTouched && selectedAirportCodes.size === 0) || selectedAirportCodes.has(code);
+    }
+
     function activeTravelersWithAirports() {
       return collectTravelers().map((traveler) => ({
         ...traveler,
-        departureAirportOptions: homeAirportsFor(traveler.city).filter((code) => selectedAirportCodes.size === 0 || selectedAirportCodes.has(code))
+        departureAirportOptions: homeAirportsFor(traveler.city).filter(airportFilterAllows)
       }));
     }
 
@@ -2706,7 +2817,7 @@
             isDirect: typeof flight.isDirect === "boolean" ? flight.isDirect : Number(flight.stops || 0) === 0,
             sourceType: "live"
           }))
-          .filter((flight) => selectedAirportCodes.size === 0 || (selectedAirportCodes.has(flight.departureAirport) && selectedAirportCodes.has(flight.arrivalAirport)))
+          .filter((flight) => airportFilterAllows(flight.departureAirport))
           .filter((flight) => !document.querySelector("#directOnly").checked || flight.isDirect);
       }
 
@@ -2744,10 +2855,15 @@
       };
     }
 
+    function airportFilterGroups() {
+      return collectTravelers().map((traveler) => ({
+        traveler,
+        airports: homeAirportsFor(traveler.city).slice(0, 3)
+      })).filter((group) => group.airports.length);
+    }
+
     function airportFilterOptions() {
-      const departure = activeTravelersWithAirports().flatMap((traveler) => homeAirportsFor(traveler.city));
-      const arrivals = destinationCities.flatMap((city) => city.airportCodes || []);
-      return [...new Set([...departure, ...arrivals])].filter(Boolean).slice(0, 40);
+      return [...new Set(airportFilterGroups().flatMap((group) => group.airports))].filter(Boolean);
     }
 
     function ensureAirportFilterElement() {
@@ -2755,7 +2871,7 @@
       if (!filter) {
         filter = document.createElement("div");
         filter.id = "airportFilters";
-        filter.className = "trip-summary";
+        filter.className = "trip-summary airport-filter";
         cityList.parentElement.insertBefore(filter, cityList);
       }
       return filter;
@@ -2763,21 +2879,33 @@
 
     function renderAirportFilters() {
       const filter = ensureAirportFilterElement();
+      const groups = airportFilterGroups();
       const codes = airportFilterOptions();
-      if (!airportFiltersInitialized) {
-        codes.forEach((code) => selectedAirportCodes.add(code));
-        airportFiltersInitialized = true;
-      }
+      const stillAvailable = new Set(codes);
+      selectedAirportCodes = new Set([...selectedAirportCodes].filter((code) => stillAvailable.has(code)));
+      codes.forEach((code) => {
+        if (!airportFiltersInitialized || (!airportFiltersTouched && !selectedAirportCodes.size)) selectedAirportCodes.add(code);
+      });
+      airportFiltersInitialized = true;
       const label = activeLocale === "en" ? "Airports" : activeLocale === "de" ? "Flughafen" : "Luchthavens";
       filter.innerHTML = `
-        <strong>${label}</strong>
-        <span>${activeLocale === "en" ? "Deselect airports you do not want." : activeLocale === "de" ? "Entferne Flughafen, die ihr nicht wollt." : "Vink luchthavens uit die jullie niet willen gebruiken."}</span>
-        <div class="toggle-row">
-          ${codes.map((code) => `
-            <label class="check-tile">
-              <input class="airport-toggle" type="checkbox" value="${code}" ${selectedAirportCodes.has(code) ? "checked" : ""}>
-              ${code}
-            </label>
+        <header>
+          <strong>${label}</strong>
+          <small>${activeLocale === "en" ? "Nearest options are selected" : activeLocale === "de" ? "Nächste Optionen sind aktiv" : "Dichtstbijzijnde opties staan aan"}</small>
+        </header>
+        <div class="airport-groups">
+          ${groups.map((group) => `
+            <div class="airport-group">
+              <span class="airport-group-title">${group.traveler.name || group.traveler.city}: ${group.traveler.city}</span>
+              <div class="toggle-row">
+                ${group.airports.map((code) => `
+                  <label class="check-tile">
+                    <input class="airport-toggle" type="checkbox" value="${code}" ${selectedAirportCodes.has(code) ? "checked" : ""}>
+                    ${code}
+                  </label>
+                `).join("")}
+              </div>
+            </div>
           `).join("")}
         </div>
       `;
@@ -2914,7 +3042,7 @@
             <div class="city-meta">
               <div class="metric"><b>${durationText(city.averageTotalTravelDuration)}</b><span>totale reistijd</span></div>
               <div class="metric"><b>${city.flights.filter((flight) => flight.isDirect).length}</b><span>directe routes</span></div>
-              <div class="metric"><b>${city.airportCodes.join(", ")}</b><span>aankomstluchthavens</span></div>
+              <div class="metric"><b>${city.airportCodes.slice(0, 3).join(", ")}</b><span>beste aankomst</span></div>
               <div class="metric"><b>&euro;${city.hotel}</b><span>verblijf p.p.</span></div>
             </div>
             <div class="chips">
@@ -2982,6 +3110,7 @@
 
     document.addEventListener("change", (event) => {
       if (!event.target.matches(".airport-toggle")) return;
+      airportFiltersTouched = true;
       if (event.target.checked) selectedAirportCodes.add(event.target.value);
       else selectedAirportCodes.delete(event.target.value);
       renderCities();
