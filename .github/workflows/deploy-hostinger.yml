@@ -22,6 +22,12 @@ jobs:
           cp outputs/index.html deploy-root/index.html
           cp outputs/europe-cities.js deploy-root/europe-cities.js
           cp outputs/meetway-hero.png deploy-root/meetway-hero.png
+          cp outputs/social-preview.jpg deploy-root/social-preview.jpg
+          cp outputs/favicon.ico deploy-root/favicon.ico
+          cp outputs/favicon-32x32.png deploy-root/favicon-32x32.png
+          cp outputs/favicon-16x16.png deploy-root/favicon-16x16.png
+          cp outputs/apple-touch-icon.png deploy-root/apple-touch-icon.png
+          cp outputs/site.webmanifest deploy-root/site.webmanifest
           find deploy-root -maxdepth 2 -type f -print
 
       - name: Check Hostinger secrets

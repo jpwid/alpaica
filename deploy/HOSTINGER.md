@@ -63,6 +63,12 @@ De deploy gebruikt `dangerous-clean-slate: true`. Dat betekent dat de webroot `p
 - `index.html`
 - `europe-cities.js`
 - `meetway-hero.png`
+- `social-preview.jpg`
+- `favicon.ico`
+- `favicon-32x32.png`
+- `favicon-16x16.png`
+- `apple-touch-icon.png`
+- `site.webmanifest`
 
 Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow of upload je via een ander proces. Push deze workflowwijziging opnieuw en controleer in GitHub Actions dat de nieuwste commit draait.
 
