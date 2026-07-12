@@ -50,7 +50,13 @@ De lokale backend `outputs/server.js`, `.env`, `.env.example` en `STARTEN.md` wo
 
 De workflow uploadt nu vast naar `public_html/`. De secret `HOSTINGER_FTP_TARGET_DIR` wordt niet meer gebruikt, zodat er niet per ongeluk naar `public_html/outputs/` gedeployed kan worden.
 
-Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow of upload je via een ander proces. Push deze workflowwijziging opnieuw en verwijder daarna de foutieve map `public_html/outputs/` in Hostinger File Manager.
+De deploy gebruikt `dangerous-clean-slate: true`. Dat betekent dat de webroot `public_html/` eerst wordt leeggemaakt en daarna alleen deze publieke bestanden terugkomen:
+
+- `index.html`
+- `europe-cities.js`
+- `meetway-hero.png`
+
+Als Hostinger toch een map `public_html/outputs/` laat zien, dan draait GitHub nog met een oude workflow of upload je via een ander proces. Push deze workflowwijziging opnieuw en controleer in GitHub Actions dat de nieuwste commit draait.
 
 In de GitHub Actions-log moet je bij `Prepare webroot files` deze regels zien:
 
