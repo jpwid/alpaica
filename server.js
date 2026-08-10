@@ -14,6 +14,7 @@ const serpApiKey = process.env.SERPAPI_API_KEY || env.SERPAPI_API_KEY || "";
 const searchApiKey = process.env.SEARCHAPI_API_KEY || env.SEARCHAPI_API_KEY || "";
 const brightDataKey = process.env.BRIGHT_DATA_API_KEY || env.BRIGHT_DATA_API_KEY || "";
 let tokenCache = { token: "", expiresAt: 0 };
+const flightLocationCache = new Map();
 
 const airportByCity = {
   amsterdam: "AMS",
@@ -392,14 +393,27 @@ async function serpApiFlight(traveler, destination, body) {
 
 async function ticketCheckerFlights(checker) {
   if (!serpApiKey) throw Object.assign(new Error("SerpApi Google Flights is nog niet geconfigureerd."), { status: 503 });
-  const origin = airportForCity(checker.origin.replace(/\s*\([A-Z]{3}\)\s*$/, ""));
-  const arrival = destinationForCity(checker.destination.replace(/\s*\([A-Z]{3}\)\s*$/, ""));
+  const selectedIata = (value, fallback) => {
+    const match = String(value || "").match(/\(([A-Z]{3})\)\s*$/i);
+    return match ? match[1].toUpperCase() : fallback(String(value || "").replace(/\s*\([A-Z]{3}\)\s*$/, ""));
+  };
+  const origin = selectedIata(checker.origin, airportForCity);
+  const arrival = selectedIata(checker.destination, destinationForCity);
   const url = new URL("https://serpapi.com/search.json");
   url.searchParams.set("engine", "google_flights");
+  url.searchParams.set("type", "1");
   url.searchParams.set("departure_id", origin);
   url.searchParams.set("arrival_id", arrival);
   url.searchParams.set("outbound_date", checker.departStart);
   if (checker.returnStart) url.searchParams.set("return_date", checker.returnStart);
+  url.searchParams.set("outbound_times", `${checker.departFrom},${Math.min(23, checker.departTo)}`);
+  url.searchParams.set("return_times", `${checker.returnFrom},${Math.min(23, checker.returnTo)}`);
+  const childAges = checker.childAges || [];
+  url.searchParams.set("adults", String(checker.adults + childAges.filter((age) => age >= 12).length));
+  url.searchParams.set("children", String(childAges.filter((age) => age >= 2 && age < 12).length));
+  url.searchParams.set("infants_in_seat", String(childAges.filter((age) => age < 2).length));
+  url.searchParams.set("stops", String(checker.direct ? 1 : checker.maxStops + 1));
+  url.searchParams.set("sort_by", "2");
   url.searchParams.set("currency", "EUR");
   url.searchParams.set("hl", "nl");
   url.searchParams.set("gl", "ch");
@@ -483,6 +497,39 @@ app.get("/health", (req, res) => {
 app.get("/api/status", (req, res) => {
   res.json(providerStatus());
 });
+
+app.get("/api/flight-locations", asyncRoute(async (req, res) => {
+  const query = String(req.query.q || "").trim();
+  if (query.length < 2) return res.json({ results: [] });
+  if (!serpApiKey) throw Object.assign(new Error("SerpApi Google Flights is nog niet geconfigureerd."), { status: 503 });
+
+  const cacheKey = query.toLocaleLowerCase("nl-NL");
+  const cached = flightLocationCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return res.json({ results: cached.results });
+
+  const url = new URL("https://serpapi.com/search.json");
+  url.searchParams.set("engine", "google_flights_autocomplete");
+  url.searchParams.set("q", query);
+  url.searchParams.set("hl", "nl");
+  url.searchParams.set("gl", "ch");
+  url.searchParams.set("exclude_regions", "true");
+  url.searchParams.set("api_key", serpApiKey);
+  const response = await fetch(url);
+  const payload = await response.json();
+  if (!response.ok || payload.error) throw providerError(payload.error || "Luchthavens zoeken is mislukt", response.status, payload);
+
+  const seen = new Set();
+  const results = (payload.suggestions || []).flatMap((suggestion) => (suggestion.airports || []).map((airport) => ({
+    code: airport.id,
+    airport: airport.name,
+    city: airport.city || suggestion.name,
+    country: String(suggestion.name || "").split(",").slice(1).join(",").trim(),
+    label: `${airport.city || suggestion.name} — ${airport.name} (${airport.id})`
+  }))).filter((item) => item.code && !seen.has(item.code) && seen.add(item.code)).slice(0, 12);
+
+  flightLocationCache.set(cacheKey, { results, expiresAt: Date.now() + 60 * 60 * 1000 });
+  res.json({ results });
+}));
 
 app.get("/api/locations", asyncRoute(async (req, res) => {
   const keyword = req.query.q || "";
