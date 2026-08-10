@@ -484,6 +484,14 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
 const ticketChecker = createTicketCheckerService({
   dataFile: process.env.TICKET_CHECKER_DATA_FILE || path.join(root, "data", "ticket-checkers.json"),
+  database: process.env.DB_HOST ? {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 3306),
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined
+  } : null,
   searchFlights: ticketCheckerFlights
 });
 app.use(ticketChecker.router);
@@ -491,7 +499,7 @@ ticketChecker.start();
 app.use(express.static(root, { extensions: ["html"] }));
 
 app.get("/health", (req, res) => {
-  res.json({ ok: true, app: "alpaica", serpapiConfigured: Boolean(serpApiKey) });
+  res.json({ ok: true, app: "alpaica", serpapiConfigured: Boolean(serpApiKey), databaseConfigured: Boolean(process.env.DB_HOST) });
 });
 
 app.get("/api/status", (req, res) => {

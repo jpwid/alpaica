@@ -3,16 +3,53 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-function createTicketCheckerService({ dataFile, searchFlights }) {
+function createTicketCheckerService({ dataFile, database, searchFlights }) {
   const router = express.Router();
+  const asyncRoute = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
   let running = false;
+  let pool;
+  let databaseReady;
 
-  function readStore() {
+  async function ensureDatabase() {
+    if (!database) return null;
+    if (!databaseReady) {
+      databaseReady = (async () => {
+        const mysql = require("mysql2/promise");
+        pool = mysql.createPool({ ...database, waitForConnections: true, connectionLimit: 4, queueLimit: 0 });
+        await pool.execute(`CREATE TABLE IF NOT EXISTS ticket_checkers (
+          id VARCHAR(16) PRIMARY KEY,
+          active TINYINT(1) NOT NULL DEFAULT 1,
+          payload LONGTEXT NOT NULL,
+          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          INDEX idx_ticket_checkers_active (active)
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+        return pool;
+      })();
+    }
+    return databaseReady;
+  }
+
+  async function readStore() {
+    if (database) {
+      const db = await ensureDatabase();
+      const [rows] = await db.execute("SELECT payload FROM ticket_checkers ORDER BY updated_at DESC");
+      return { checkers: rows.map((row) => JSON.parse(row.payload)) };
+    }
     try { return JSON.parse(fs.readFileSync(dataFile, "utf8")); }
     catch { return { checkers: [] }; }
   }
 
-  function writeStore(store) {
+  async function writeStore(store) {
+    if (database) {
+      const db = await ensureDatabase();
+      for (const checker of store.checkers) {
+        await db.execute(
+          "INSERT INTO ticket_checkers (id, active, payload) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE active = VALUES(active), payload = VALUES(payload), updated_at = CURRENT_TIMESTAMP",
+          [checker.id, checker.active ? 1 : 0, JSON.stringify(checker)]
+        );
+      }
+      return;
+    }
     fs.mkdirSync(path.dirname(dataFile), { recursive: true });
     const temporary = `${dataFile}.tmp`;
     fs.writeFileSync(temporary, JSON.stringify(store, null, 2));
@@ -68,51 +105,53 @@ function createTicketCheckerService({ dataFile, searchFlights }) {
     return valid;
   }
 
-  router.get("/api/ticket-checkers", (req, res) => {
-    const store = readStore();
+  router.get("/api/ticket-checkers", asyncRoute(async (req, res) => {
+    const store = await readStore();
     res.json({ checkers: store.checkers.filter((checker) => checker.active).map(publicChecker) });
-  });
+  }));
 
-  router.get("/api/ticket-checkers/:id", (req, res) => {
-    const checker = readStore().checkers.find((item) => item.id === String(req.params.id).toUpperCase());
+  router.get("/api/ticket-checkers/:id", asyncRoute(async (req, res) => {
+    const checker = (await readStore()).checkers.find((item) => item.id === String(req.params.id).toUpperCase());
     if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
     res.json({ checker: publicChecker(checker) });
-  });
+  }));
 
-  router.post("/api/ticket-checkers", (req, res) => {
-    const store = readStore();
+  router.post("/api/ticket-checkers", asyncRoute(async (req, res) => {
+    const store = await readStore();
     const requestedId = String(req.body.id || "").toUpperCase();
     const index = requestedId ? store.checkers.findIndex((item) => item.id === requestedId) : -1;
     const previous = index >= 0 ? store.checkers[index] : {};
     const checker = { ...clean(req.body, previous), id: index >= 0 ? requestedId : shortId(store) };
     if (!checker.origin || !checker.destination) return res.status(400).json({ error: "Vul vertrek en bestemming in." });
     if (index >= 0) store.checkers[index] = checker; else store.checkers.unshift(checker);
-    writeStore(store);
+    await writeStore(store);
     res.status(index >= 0 ? 200 : 201).json({ checker: publicChecker(checker) });
-  });
+  }));
 
-  router.post("/api/ticket-checkers/:id/status", (req, res) => {
-    const store = readStore();
+  router.post("/api/ticket-checkers/:id/status", asyncRoute(async (req, res) => {
+    const store = await readStore();
     const checker = store.checkers.find((item) => item.id === String(req.params.id).toUpperCase());
     if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
-    checker.active = Boolean(req.body.active); checker.updatedAt = new Date().toISOString(); writeStore(store);
+    checker.active = Boolean(req.body.active);
+    checker.updatedAt = new Date().toISOString();
+    await writeStore(store);
     res.json({ checker: publicChecker(checker) });
-  });
+  }));
 
-  router.post("/api/ticket-checkers/:id/check", async (req, res, next) => {
-    try {
-      const store = readStore();
-      const checker = store.checkers.find((item) => item.id === String(req.params.id).toUpperCase());
-      if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
-      const offers = await runCheck(checker); writeStore(store); res.json({ checker: publicChecker(checker), offers });
-    } catch (error) { next(error); }
-  });
+  router.post("/api/ticket-checkers/:id/check", asyncRoute(async (req, res) => {
+    const store = await readStore();
+    const checker = store.checkers.find((item) => item.id === String(req.params.id).toUpperCase());
+    if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
+    const offers = await runCheck(checker);
+    await writeStore(store);
+    res.json({ checker: publicChecker(checker), offers });
+  }));
 
   async function checkSchedule() {
     if (running) return;
     running = true;
     try {
-      const store = readStore();
+      const store = await readStore();
       const parts = new Intl.DateTimeFormat("nl-NL", { timeZone: "Europe/Zurich", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
       const time = `${parts.find((part) => part.type === "hour").value}:${parts.find((part) => part.type === "minute").value}`;
       const day = new Date().toISOString().slice(0, 10);
@@ -125,11 +164,18 @@ function createTicketCheckerService({ dataFile, searchFlights }) {
         catch (error) { checker.lastError = error.message; checker.updatedAt = new Date().toISOString(); }
         changed = true;
       }
-      if (changed) writeStore(store);
+      if (changed) await writeStore(store);
     } finally { running = false; }
   }
 
-  return { router, start() { setInterval(checkSchedule, 60_000).unref(); setTimeout(checkSchedule, 5_000).unref(); } };
+  return {
+    router,
+    start() {
+      if (database) ensureDatabase().then(() => console.log("Ticket Checker database verbonden.")).catch((error) => console.error("Ticket Checker databasefout:", error.message));
+      setInterval(checkSchedule, 60_000).unref();
+      setTimeout(checkSchedule, 5_000).unref();
+    }
+  };
 }
 
 module.exports = { createTicketCheckerService };
