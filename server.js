@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
+const { createTicketCheckerService } = require("./ticket-checker-store");
 
 const root = __dirname;
 const env = loadEnv(path.join(root, ".env"));
@@ -389,6 +390,31 @@ async function serpApiFlight(traveler, destination, body) {
   return normalizeSerpOption(option, traveler, origin, arrival, body);
 }
 
+async function ticketCheckerFlights(checker) {
+  if (!serpApiKey) throw Object.assign(new Error("SerpApi Google Flights is nog niet geconfigureerd."), { status: 503 });
+  const origin = airportForCity(checker.origin.replace(/\s*\([A-Z]{3}\)\s*$/, ""));
+  const arrival = destinationForCity(checker.destination.replace(/\s*\([A-Z]{3}\)\s*$/, ""));
+  const url = new URL("https://serpapi.com/search.json");
+  url.searchParams.set("engine", "google_flights");
+  url.searchParams.set("departure_id", origin);
+  url.searchParams.set("arrival_id", arrival);
+  url.searchParams.set("outbound_date", checker.departStart);
+  if (checker.returnStart) url.searchParams.set("return_date", checker.returnStart);
+  url.searchParams.set("currency", "EUR");
+  url.searchParams.set("hl", "nl");
+  url.searchParams.set("gl", "ch");
+  url.searchParams.set("api_key", serpApiKey);
+  const response = await fetch(url);
+  const payload = await response.json();
+  if (!response.ok || payload.error) throw providerError(payload.error || "Google Flights zoekopdracht mislukt", response.status, payload);
+  return [...(payload.best_flights || []), ...(payload.other_flights || [])]
+    .filter((option) => Number(option.price || 0) > 0)
+    .filter((option) => !checker.direct || (option.flights || []).length <= 1)
+    .filter((option) => Math.max(0, (option.flights || []).length - 1) <= checker.maxStops)
+    .map((option) => normalizeSerpOption(option, { name: "Ticket Checker", city: checker.origin }, origin, arrival, { outbound: "" }))
+    .slice(0, 3);
+}
+
 const flightSearchAdapters = {
   serpapi: {
     id: "serpapi",
@@ -442,6 +468,12 @@ const app = express();
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
+const ticketChecker = createTicketCheckerService({
+  dataFile: process.env.TICKET_CHECKER_DATA_FILE || path.join(root, "data", "ticket-checkers.json"),
+  searchFlights: ticketCheckerFlights
+});
+app.use(ticketChecker.router);
+ticketChecker.start();
 app.use(express.static(root, { extensions: ["html"] }));
 
 app.get("/health", (req, res) => {

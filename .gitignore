@@ -3,3 +3,5 @@ outputs/server-start.log
 outputs/server-start.err
 node_modules/
 dist/
+data/
+server-test.*.log
