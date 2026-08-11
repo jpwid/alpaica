@@ -658,10 +658,17 @@ app.get("/api/flight-locations", asyncRoute(async (req, res) => {
   const allAirportsLabel = { nl: "Alle luchthavens", de: "Alle Flughäfen", fr: "Tous les aéroports", en: "All airports" }[language];
   const results = (payload.suggestions || []).flatMap((suggestion) => {
     const country = String(suggestion.name || "").split(",").slice(1).join(",").trim();
-    const stationPattern = /\b(station|railway|railroad|train|gare|bahnhof|hauptbahnhof|centraal|central station|stazione|estación|estacao)\b/i;
-    const airports = (suggestion.airports || []).filter((airport) =>
-      /^[A-Z]{3}$/.test(String(airport.id || "")) && !stationPattern.test(String(airport.name || ""))
-    );
+    const stationPattern = /\b(station|railway|railroad|train|gare|bahnhof|hauptbahnhof|centraal|central station|stazione|estación|estacao|st pancras|paddington|king'?s cross|victoria coach|liverpool street|ebbsfleet)\b/i;
+    const knownRailCodes = new Set(["QQS", "QQK", "QQP", "XQE", "ZEP", "ZLS", "ZYA", "QRH", "ZYR", "ZYZ", "ZWE", "QDU", "QKL", "QPP", "ZMU", "ZVR", "ZWS", "XPG", "XGB"]);
+    const airports = (suggestion.airports || []).filter((airport) => {
+      const code = String(airport.id || "").toUpperCase();
+      const name = String(airport.name || "");
+      const transportType = String(airport.type || airport.transport_type || airport.category || "");
+      return /^[A-Z]{3}$/.test(code)
+        && !knownRailCodes.has(code)
+        && !stationPattern.test(name)
+        && !/train|rail|station/i.test(transportType);
+    });
     const cityChoice = airports.length >= 1 && /^\/[mg]\//.test(String(suggestion.id || ""))
       ? [{
           code: suggestion.id,
