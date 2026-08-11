@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-function createTicketCheckerService({ dataFile, database, searchFlights }) {
+function createTicketCheckerService({ dataFile, database, searchFlights, notify }) {
   const router = express.Router();
   const asyncRoute = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
   let running = false;
@@ -66,9 +66,11 @@ function createTicketCheckerService({ dataFile, database, searchFlights }) {
   function clean(body, existing = {}) {
     const text = (value, fallback = "") => String(value ?? fallback).trim();
     const number = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+    const resetResults = Boolean(body.resetResults);
     return {
       ...existing,
       origin: text(body.origin, existing.origin), destination: text(body.destination, existing.destination),
+      email: text(body.email, existing.email).slice(0, 254),
       direct: Boolean(body.direct), maxStops: Math.min(2, Math.max(0, number(body.maxStops, 1))),
       departStart: text(body.departStart, existing.departStart), departEnd: text(body.departEnd, existing.departEnd),
       returnStart: text(body.returnStart, existing.returnStart), returnEnd: text(body.returnEnd, existing.returnEnd),
@@ -78,7 +80,9 @@ function createTicketCheckerService({ dataFile, database, searchFlights }) {
       childAges: Array.isArray(body.childAges) ? body.childAges.slice(0, 6).map((age) => Math.min(17, Math.max(0, number(age, 7)))) : (existing.childAges || []),
       updateTimes: Array.isArray(body.updateTimes) ? body.updateTimes.slice(0, 4).map(String).filter((value) => /^\d{2}:\d{2}$/.test(value)) : (existing.updateTimes || ["08:00"]),
       active: body.active !== false,
-      history: existing.history || [], feed: existing.feed || [], createdAt: existing.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString()
+      history: resetResults ? [] : (existing.history || []),
+      feed: resetResults ? [] : (existing.feed || []),
+      createdAt: existing.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString()
     };
   }
 
@@ -102,7 +106,26 @@ function createTicketCheckerService({ dataFile, database, searchFlights }) {
     checker.feed = checker.feed.slice(0, 90);
     checker.lastError = "";
     checker.updatedAt = now.toISOString();
+    if (notify && checker.email) {
+      try {
+        await notify(checker, valid);
+        checker.lastEmailError = "";
+        checker.lastEmailAt = now.toISOString();
+      } catch (error) {
+        checker.lastEmailError = error.message;
+      }
+    }
     return valid;
+  }
+
+  function rebuildHistory(checker) {
+    const daily = new Map();
+    for (const item of checker.feed || []) {
+      const date = String(item.checkedAt || "").slice(0, 10);
+      if (!date || !Number(item.lowestPrice)) continue;
+      daily.set(date, Math.min(daily.get(date) || Infinity, Number(item.lowestPrice)));
+    }
+    checker.history = [...daily.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, price]) => ({ date, price })).slice(-370);
   }
 
   router.get("/api/ticket-checkers", asyncRoute(async (req, res) => {
@@ -123,6 +146,7 @@ function createTicketCheckerService({ dataFile, database, searchFlights }) {
     const previous = index >= 0 ? store.checkers[index] : {};
     const checker = { ...clean(req.body, previous), id: index >= 0 ? requestedId : shortId(store) };
     if (!checker.origin || !checker.destination) return res.status(400).json({ error: "Vul vertrek en bestemming in." });
+    if (checker.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(checker.email)) return res.status(400).json({ error: "Vul een geldig e-mailadres in." });
     if (index >= 0) store.checkers[index] = checker; else store.checkers.unshift(checker);
     await writeStore(store);
     res.status(index >= 0 ? 200 : 201).json({ checker: publicChecker(checker) });
@@ -145,6 +169,30 @@ function createTicketCheckerService({ dataFile, database, searchFlights }) {
     const offers = await runCheck(checker);
     await writeStore(store);
     res.json({ checker: publicChecker(checker), offers });
+  }));
+
+  router.delete("/api/ticket-checkers/:id/results", asyncRoute(async (req, res) => {
+    const store = await readStore();
+    const checker = store.checkers.find((item) => item.id === String(req.params.id).toUpperCase());
+    if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
+    checker.feed = [];
+    checker.history = [];
+    checker.updatedAt = new Date().toISOString();
+    await writeStore(store);
+    res.json({ checker: publicChecker(checker) });
+  }));
+
+  router.delete("/api/ticket-checkers/:id/results/:resultId", asyncRoute(async (req, res) => {
+    const store = await readStore();
+    const checker = store.checkers.find((item) => item.id === String(req.params.id).toUpperCase());
+    if (!checker) return res.status(404).json({ error: "Checker niet gevonden." });
+    const before = (checker.feed || []).length;
+    checker.feed = (checker.feed || []).filter((item) => item.id !== req.params.resultId);
+    if (checker.feed.length === before) return res.status(404).json({ error: "Prijsresultaat niet gevonden." });
+    rebuildHistory(checker);
+    checker.updatedAt = new Date().toISOString();
+    await writeStore(store);
+    res.json({ checker: publicChecker(checker) });
   }));
 
   async function checkSchedule() {

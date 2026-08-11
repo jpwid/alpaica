@@ -13,6 +13,15 @@ const clientSecret = process.env.AMADEUS_CLIENT_SECRET || env.AMADEUS_CLIENT_SEC
 const serpApiKey = process.env.SERPAPI_API_KEY || env.SERPAPI_API_KEY || "";
 const searchApiKey = process.env.SEARCHAPI_API_KEY || env.SEARCHAPI_API_KEY || "";
 const brightDataKey = process.env.BRIGHT_DATA_API_KEY || env.BRIGHT_DATA_API_KEY || "";
+const smtpConfig = {
+  host: process.env.SMTP_HOST || env.SMTP_HOST || "",
+  port: Number(process.env.SMTP_PORT || env.SMTP_PORT || 587),
+  secure: String(process.env.SMTP_SECURE || env.SMTP_SECURE || "false") === "true",
+  user: process.env.SMTP_USER || env.SMTP_USER || "",
+  password: process.env.SMTP_PASSWORD || env.SMTP_PASSWORD || "",
+  from: process.env.SMTP_FROM || env.SMTP_FROM || process.env.SMTP_USER || env.SMTP_USER || ""
+};
+const emailConfigured = Boolean(smtpConfig.host && smtpConfig.user && smtpConfig.password && smtpConfig.from);
 let tokenCache = { token: "", expiresAt: 0 };
 const flightLocationCache = new Map();
 
@@ -290,27 +299,60 @@ function firstFlightTime(option, field) {
   return airport?.time || "";
 }
 
+function normalizeSerpSegments(flights = []) {
+  return flights.map((flight) => ({
+    airline: flight.airline || "",
+    airlineLogo: flight.airline_logo || "",
+    flightNumber: flight.flight_number || "",
+    airplane: flight.airplane || "",
+    departureAirport: flight.departure_airport?.name || flight.departure_airport?.id || "",
+    departureCode: flight.departure_airport?.id || "",
+    departureTime: flight.departure_airport?.time || "",
+    arrivalAirport: flight.arrival_airport?.name || flight.arrival_airport?.id || "",
+    arrivalCode: flight.arrival_airport?.id || "",
+    arrivalTime: flight.arrival_airport?.time || "",
+    duration: Number(flight.duration || 0)
+  }));
+}
+
+function segmentLayovers(segments = []) {
+  return segments.slice(0, -1).map((segment, index) => {
+    const next = segments[index + 1];
+    const arrival = new Date(String(segment.arrivalTime || "").replace(" ", "T"));
+    const departure = new Date(String(next.departureTime || "").replace(" ", "T"));
+    const duration = Number.isNaN(arrival.getTime()) || Number.isNaN(departure.getTime())
+      ? 0
+      : Math.max(0, Math.round((departure - arrival) / 60000));
+    return {
+      airport: segment.arrivalAirport,
+      code: segment.arrivalCode,
+      duration
+    };
+  });
+}
+
 function normalizeSerpOption(option, traveler, origin, destination, fallback) {
   const flights = option?.flights || [];
+  const returnFlights = fallback.returnOption?.flights || option?.return_flights || [];
   const first = flights[0] || {};
   const last = flights[flights.length - 1] || first;
   const departure = firstFlightTime(option, "departure") || fallback.outbound || "";
   const arrival = firstFlightTime(option, "arrival") || "";
   const stops = Math.max(0, flights.length - 1);
-  const flightDuration = Number(option?.total_duration || 0);
+  const outboundDuration = Number(option?.total_duration || 0);
+  const returnDuration = Number(fallback.returnOption?.total_duration || 0);
+  const flightDuration = outboundDuration + returnDuration;
   // Ground transfer is estimated until a maps/transport provider is connected.
   const homeToAirportDuration = estimateGroundMinutes(traveler.city, origin);
   const arrivalToCenterDuration = estimateGroundMinutes(destination, "center");
-  const segments = flights.map((flight) => ({
-    airline: flight.airline || "",
-    flightNumber: flight.flight_number || "",
-    airplane: flight.airplane || "",
-    departureAirport: flight.departure_airport?.name || flight.departure_airport?.id || "",
-    departureTime: flight.departure_airport?.time || "",
-    arrivalAirport: flight.arrival_airport?.name || flight.arrival_airport?.id || "",
-    arrivalTime: flight.arrival_airport?.time || "",
-    duration: flight.duration || null
-  }));
+  const outboundSegments = normalizeSerpSegments(flights);
+  const returnSegments = normalizeSerpSegments(returnFlights);
+  const segments = [...outboundSegments, ...returnSegments];
+  const airlines = [...new Set(segments.map((segment) => segment.airline).filter(Boolean))];
+  const adultCount = Number(fallback.adultCount || 1);
+  const childCount = Number(fallback.childCount || 0);
+  const travelerCount = Math.max(1, adultCount + childCount);
+  const price = Number(fallback.returnOption?.price || option?.price || 0);
   return {
     traveler: traveler.name || "Reiziger",
     origin,
@@ -318,18 +360,31 @@ function normalizeSerpOption(option, traveler, origin, destination, fallback) {
     departureAirport: origin,
     arrivalAirport: destination,
     nearbyAlternativeAirports: [...new Set([...(airportOptionsFor(traveler.city) || []), ...(airportOptionsFor(destination, true) || [])])].filter((code) => code !== origin && code !== destination),
-    airline: first.airline || option?.airline || "Google Flights",
+    airline: airlines.join(" + ") || first.airline || option?.airline || "Google Flights",
     outbound: arrival ? `${departure} - ${arrival}` : departure || "Tijd via provider",
-    inbound: option?.return_flights?.length ? "Retourdetails via provider" : "",
+    inbound: returnSegments.length ? `${returnSegments[0].departureTime} - ${returnSegments[returnSegments.length - 1].arrivalTime}` : "",
+    departureDate: fallback.departureDate || "",
+    returnDate: fallback.returnDate || "",
     duration: flightDuration,
     flightDuration,
+    outboundDuration,
+    returnDuration,
     homeToAirportDuration,
     arrivalToCenterDuration,
     totalTravelDuration: flightDuration ? flightDuration + homeToAirportDuration + arrivalToCenterDuration : 0,
     isDirect: stops === 0,
     stops,
-    price: Number(option?.price || 0),
+    returnStops: Math.max(0, returnFlights.length - 1),
+    price,
+    adultCount,
+    childCount,
+    travelerCount,
+    pricePerTraveler: Math.round((price / travelerCount) * 100) / 100,
     segments,
+    outboundSegments,
+    returnSegments,
+    outboundLayovers: segmentLayovers(outboundSegments),
+    returnLayovers: segmentLayovers(returnSegments),
     source: "SerpApi Google Flights",
     bookingToken: option?.booking_token || option?.departure_token || ""
   };
@@ -393,12 +448,13 @@ async function serpApiFlight(traveler, destination, body) {
 
 async function ticketCheckerFlights(checker) {
   if (!serpApiKey) throw Object.assign(new Error("SerpApi Google Flights is nog niet geconfigureerd."), { status: 503 });
-  const selectedIata = (value, fallback) => {
-    const match = String(value || "").match(/\(([A-Z]{3})\)\s*$/i);
-    return match ? match[1].toUpperCase() : fallback(String(value || "").replace(/\s*\([A-Z]{3}\)\s*$/, ""));
+  const selectedLocation = (value, fallback) => {
+    const match = String(value || "").match(/\(((?:[A-Z]{3})|(?:\/[mg]\/[^)]+))\)\s*$/i);
+    if (match) return match[1].startsWith("/") ? match[1] : match[1].toUpperCase();
+    return fallback(String(value || "").replace(/\s*\((?:[A-Z]{3}|\/[mg]\/[^)]+)\)\s*$/i, ""));
   };
-  const origin = selectedIata(checker.origin, airportForCity);
-  const arrival = selectedIata(checker.destination, destinationForCity);
+  const origin = selectedLocation(checker.origin, airportForCity);
+  const arrival = selectedLocation(checker.destination, destinationForCity);
   const url = new URL("https://serpapi.com/search.json");
   url.searchParams.set("engine", "google_flights");
   url.searchParams.set("type", "1");
@@ -421,12 +477,38 @@ async function ticketCheckerFlights(checker) {
   const response = await fetch(url);
   const payload = await response.json();
   if (!response.ok || payload.error) throw providerError(payload.error || "Google Flights zoekopdracht mislukt", response.status, payload);
-  return [...(payload.best_flights || []), ...(payload.other_flights || [])]
+  const outboundOptions = [...(payload.best_flights || []), ...(payload.other_flights || [])]
     .filter((option) => Number(option.price || 0) > 0)
     .filter((option) => !checker.direct || (option.flights || []).length <= 1)
     .filter((option) => Math.max(0, (option.flights || []).length - 1) <= checker.maxStops)
-    .map((option) => normalizeSerpOption(option, { name: "Ticket Checker", city: checker.origin }, origin, arrival, { outbound: "" }))
     .slice(0, 3);
+
+  const offers = await Promise.all(outboundOptions.map(async (option) => {
+    let returnOption = null;
+    if (checker.returnStart && option.departure_token) {
+      const returnUrl = new URL(url);
+      returnUrl.searchParams.set("departure_token", option.departure_token);
+      const returnResponse = await fetch(returnUrl);
+      const returnPayload = await returnResponse.json();
+      if (returnResponse.ok && !returnPayload.error) {
+        returnOption = [...(returnPayload.best_flights || []), ...(returnPayload.other_flights || [])]
+          .filter((candidate) => Number(candidate.price || 0) > 0)
+          .filter((candidate) => !checker.direct || (candidate.flights || []).length <= 1)
+          .filter((candidate) => Math.max(0, (candidate.flights || []).length - 1) <= checker.maxStops)
+          .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))[0] || null;
+      }
+    }
+    return normalizeSerpOption(option, { name: "Ticket Checker", city: checker.origin }, origin, arrival, {
+      outbound: "",
+      returnOption,
+      departureDate: checker.departStart,
+      returnDate: checker.returnStart,
+      adultCount: checker.adults,
+      childCount: (checker.childAges || []).length
+    });
+  }));
+
+  return offers.sort((a, b) => a.price - b.price).slice(0, 3);
 }
 
 const flightSearchAdapters = {
@@ -466,6 +548,39 @@ function asyncRoute(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 }
 
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[character]));
+
+function emailSegments(title, segments = [], layovers = []) {
+  if (!segments.length) return "";
+  return `<h4 style="margin:16px 0 8px">${escapeHtml(title)}</h4>${segments.map((segment, index) => {
+    const layover = layovers[index];
+    return `<div style="padding:10px 0;border-top:1px solid #ddd"><strong>${escapeHtml(segment.airline)} ${escapeHtml(segment.flightNumber)}</strong><br>${escapeHtml(segment.departureCode)} ${escapeHtml(segment.departureTime)} → ${escapeHtml(segment.arrivalCode)} ${escapeHtml(segment.arrivalTime)} · ${escapeHtml(segment.duration)} min${layover ? `<br><span style="color:#6b645e">Overstap: ${escapeHtml(layover.code || layover.airport)} · ${escapeHtml(layover.duration)} min</span>` : ""}</div>`;
+  }).join("")}`;
+}
+
+async function sendTicketCheckerUpdate(checker, offers) {
+  if (!emailConfigured || !checker.email) return;
+  const nodemailer = require("nodemailer");
+  const transporter = nodemailer.createTransport({
+    host: smtpConfig.host,
+    port: smtpConfig.port,
+    secure: smtpConfig.secure,
+    auth: { user: smtpConfig.user, pass: smtpConfig.password }
+  });
+  const offerHtml = offers.map((offer, index) => `<section style="margin:18px 0;padding:16px;border:1px solid #18181b;border-radius:10px">
+    <h3 style="margin:0 0 5px">${index + 1}. €${escapeHtml(offer.price)} · ${escapeHtml(offer.airline)}</h3>
+    <div>${escapeHtml(offer.departureDate)} t/m ${escapeHtml(offer.returnDate)} · gemiddeld €${escapeHtml(offer.pricePerTraveler)} per reiziger</div>
+    ${emailSegments("Heenvlucht", offer.outboundSegments, offer.outboundLayovers)}
+    ${emailSegments("Terugvlucht", offer.returnSegments, offer.returnLayovers)}
+  </section>`).join("");
+  await transporter.sendMail({
+    from: smtpConfig.from,
+    to: checker.email,
+    subject: `Ticket Checker ${checker.id}: vanaf €${offers[0]?.price || "-"}`,
+    html: `<div style="font-family:Arial,sans-serif;color:#18181b;max-width:680px;margin:auto"><h1>${escapeHtml(checker.origin)} → ${escapeHtml(checker.destination)}</h1><p>Dit zijn de drie voordeligste actuele resultaten.</p>${offerHtml}<p><a href="https://alpaica.com/flightchecker/?checker=${encodeURIComponent(checker.id)}">Open Ticket Checker ${escapeHtml(checker.id)}</a></p><p style="color:#6b645e;font-size:12px">Google Flights geeft één ticketprijs voor de ingestelde reizigers en geen betrouwbare prijsuitsplitsing per leeftijdscategorie. Het bedrag per reiziger is daarom een gemiddelde.</p></div>`
+  });
+}
+
 function providerStatus() {
   return {
     providers: [{ id: "amadeus", name: "Amadeus", configured: Boolean(clientId && clientSecret), environment: amadeusBase.includes("test.") ? "test" : "production" }],
@@ -474,7 +589,8 @@ function providerStatus() {
       { id: "searchapi", name: "SearchAPI Google Flights", configured: Boolean(searchApiKey) },
       { id: "brightdata", name: "Bright Data SERP API", configured: Boolean(brightDataKey) }
     ],
-    skyscanner: { configured: false, note: "Partner API-toegang vereist" }
+    skyscanner: { configured: false, note: "Partner API-toegang vereist" },
+    emailNotifications: { configured: emailConfigured }
   };
 }
 
@@ -492,7 +608,8 @@ const ticketChecker = createTicketCheckerService({
     password: process.env.DB_PASSWORD,
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined
   } : null,
-  searchFlights: ticketCheckerFlights
+  searchFlights: ticketCheckerFlights,
+  notify: sendTicketCheckerUpdate
 });
 app.use(ticketChecker.router);
 ticketChecker.start();
@@ -527,13 +644,28 @@ app.get("/api/flight-locations", asyncRoute(async (req, res) => {
   if (!response.ok || payload.error) throw providerError(payload.error || "Luchthavens zoeken is mislukt", response.status, payload);
 
   const seen = new Set();
-  const results = (payload.suggestions || []).flatMap((suggestion) => (suggestion.airports || []).map((airport) => ({
-    code: airport.id,
-    airport: airport.name,
-    city: airport.city || suggestion.name,
-    country: String(suggestion.name || "").split(",").slice(1).join(",").trim(),
-    label: `${airport.city || suggestion.name} — ${airport.name} (${airport.id})`
-  }))).filter((item) => item.code && !seen.has(item.code) && seen.add(item.code)).slice(0, 12);
+  const results = (payload.suggestions || []).flatMap((suggestion) => {
+    const country = String(suggestion.name || "").split(",").slice(1).join(",").trim();
+    const airports = (suggestion.airports || []).filter((airport) => /^[A-Z]{3}$/.test(String(airport.id || "")));
+    const cityChoice = airports.length > 1 && /^\/[mg]\//.test(String(suggestion.id || ""))
+      ? [{
+          code: suggestion.id,
+          airport: "Alle luchthavens",
+          city: suggestion.name,
+          country,
+          type: "city",
+          label: `${suggestion.name} — Alle luchthavens (${suggestion.id})`
+        }]
+      : [];
+    return [...cityChoice, ...airports.map((airport) => ({
+      code: airport.id,
+      airport: airport.name,
+      city: airport.city || suggestion.name,
+      country,
+      type: "airport",
+      label: `${airport.city || suggestion.name} — ${airport.name} (${airport.id})`
+    }))];
+  }).filter((item) => item.code && !seen.has(item.code) && seen.add(item.code)).slice(0, 14);
 
   flightLocationCache.set(cacheKey, { results, expiresAt: Date.now() + 60 * 60 * 1000 });
   res.json({ results });
