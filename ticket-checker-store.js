@@ -70,6 +70,7 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
     return {
       ...existing,
       origin: text(body.origin, existing.origin), destination: text(body.destination, existing.destination),
+      originCode: text(body.originCode, existing.originCode), destinationCode: text(body.destinationCode, existing.destinationCode),
       email: text(body.email, existing.email).slice(0, 254),
       tripType: body.tripType === "oneway" ? "oneway" : "roundtrip",
       direct: Math.min(2, Math.max(0, number(body.maxStops, 1))) === 0,

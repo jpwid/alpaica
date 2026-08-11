@@ -458,8 +458,9 @@ async function ticketCheckerFlights(checker) {
     if (match) return match[1].startsWith("/") ? match[1] : match[1].toUpperCase();
     return fallback(String(value || "").replace(/\s*\((?:[A-Z]{3}|\/[mg]\/[^)]+)\)\s*$/i, ""));
   };
-  const origin = selectedLocation(checker.origin, airportForCity);
-  const arrival = selectedLocation(checker.destination, destinationForCity);
+  const storedLocation = (value) => /^(?:[A-Z]{3}|\/[mg]\/[^\s]+)$/i.test(String(value || "")) ? String(value) : "";
+  const origin = storedLocation(checker.originCode) || selectedLocation(checker.origin, airportForCity);
+  const arrival = storedLocation(checker.destinationCode) || selectedLocation(checker.destination, destinationForCity);
   const existingTripDays = checker.departStart && checker.returnStart
     ? Math.max(1, Math.round((new Date(`${checker.returnStart}T12:00:00`) - new Date(`${checker.departStart}T12:00:00`)) / 86400000))
     : 7;
@@ -594,11 +595,15 @@ async function sendTicketCheckerUpdate(checker, offers) {
     ${emailSegments("Heenvlucht", offer.outboundSegments, offer.outboundLayovers)}
     ${emailSegments("Terugvlucht", offer.returnSegments, offer.returnLayovers)}
   </section>`).join("");
+  const offerText = offers.map((offer, index) => `${index + 1}. €${offer.price} · ${offer.airline}\n${offer.departureDate}${offer.returnDate ? ` t/m ${offer.returnDate}` : ""} · gemiddeld €${offer.pricePerTraveler} per reiziger`).join("\n\n");
+  const checkerUrl = `https://alpaica.com/flightchecker/?checker=${encodeURIComponent(checker.id)}`;
   await transporter.sendMail({
-    from: smtpConfig.from,
+    from: { name: "Alpaica Ticket Checker", address: smtpConfig.from },
+    replyTo: smtpConfig.from,
     to: checker.email,
     subject: `Ticket Checker ${checker.id}: vanaf €${offers[0]?.price || "-"}`,
-    html: `<div style="font-family:Arial,sans-serif;color:#18181b;max-width:680px;margin:auto"><h1>${escapeHtml(checker.origin)} → ${escapeHtml(checker.destination)}</h1><p>Dit zijn de drie voordeligste actuele resultaten.</p>${offerHtml}<p><a href="https://alpaica.com/flightchecker/?checker=${encodeURIComponent(checker.id)}">Open Ticket Checker ${escapeHtml(checker.id)}</a></p><p style="color:#6b645e;font-size:12px">Google Flights geeft één ticketprijs voor de ingestelde reizigers en geen betrouwbare prijsuitsplitsing per leeftijdscategorie. Het bedrag per reiziger is daarom een gemiddelde.</p></div>`
+    text: `${checker.origin} → ${checker.destination}\n\nDit zijn de drie voordeligste actuele resultaten.\n\n${offerText}\n\nOpen Ticket Checker ${checker.id}: ${checkerUrl}\n\nJe ontvangt dit bericht omdat voor dit e-mailadres een Ticket Checker is geactiveerd.`,
+    html: `<div style="font-family:Arial,sans-serif;color:#18181b;max-width:680px;margin:auto"><h1>${escapeHtml(checker.origin)} → ${escapeHtml(checker.destination)}</h1><p>Dit zijn de drie voordeligste actuele resultaten.</p>${offerHtml}<p><a href="${checkerUrl}">Open Ticket Checker ${escapeHtml(checker.id)}</a></p><p style="color:#6b645e;font-size:12px">Google Flights geeft één ticketprijs voor de ingestelde reizigers en geen betrouwbare prijsuitsplitsing per leeftijdscategorie. Het bedrag per reiziger is daarom een gemiddelde.</p><p style="color:#6b645e;font-size:12px">Je ontvangt dit bericht omdat voor dit e-mailadres een Ticket Checker is geactiveerd.</p></div>`
   });
 }
 
@@ -687,7 +692,7 @@ app.get("/api/flight-locations", asyncRoute(async (req, res) => {
           city: suggestion.name,
           country,
           type: "city",
-          label: `${suggestion.name} — ${allAirportsLabel} (${suggestion.id})`
+          label: `${suggestion.name} — ${allAirportsLabel}`
         }]
       : [];
     return [...cityChoice, ...airports.map((airport) => ({
