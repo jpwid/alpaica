@@ -460,6 +460,17 @@ async function ticketCheckerFlights(checker) {
   };
   const origin = selectedLocation(checker.origin, airportForCity);
   const arrival = selectedLocation(checker.destination, destinationForCity);
+  const existingTripDays = checker.departStart && checker.returnStart
+    ? Math.max(1, Math.round((new Date(`${checker.returnStart}T12:00:00`) - new Date(`${checker.departStart}T12:00:00`)) / 86400000))
+    : 7;
+  const minTripDays = Math.min(60, Math.max(1, Number(checker.minTripDays || existingTripDays)));
+  const minimumReturn = new Date(`${checker.departStart}T12:00:00`);
+  minimumReturn.setDate(minimumReturn.getDate() + minTripDays);
+  const minimumReturnDate = minimumReturn.toISOString().slice(0, 10);
+  const returnDate = checker.returnStart && checker.returnStart >= minimumReturnDate ? checker.returnStart : minimumReturnDate;
+  if (checker.tripType !== "oneway" && checker.returnEnd && returnDate > checker.returnEnd) {
+    throw Object.assign(new Error(`Binnen deze datumranges is geen reis van minimaal ${minTripDays} dagen mogelijk.`), { status: 400 });
+  }
   const url = new URL("https://serpapi.com/search.json");
   url.searchParams.set("engine", "google_flights");
   const isRoundTrip = checker.tripType !== "oneway";
@@ -467,7 +478,7 @@ async function ticketCheckerFlights(checker) {
   url.searchParams.set("departure_id", origin);
   url.searchParams.set("arrival_id", arrival);
   url.searchParams.set("outbound_date", checker.departStart);
-  if (isRoundTrip && checker.returnStart) url.searchParams.set("return_date", checker.returnStart);
+  if (isRoundTrip && returnDate) url.searchParams.set("return_date", returnDate);
   url.searchParams.set("outbound_times", `${checker.departFrom},${Math.min(23, checker.departTo)}`);
   if (isRoundTrip) url.searchParams.set("return_times", `${checker.returnFrom},${Math.min(23, checker.returnTo)}`);
   const childAges = checker.childAges || [];
@@ -493,7 +504,7 @@ async function ticketCheckerFlights(checker) {
 
   const offers = await Promise.all(outboundOptions.map(async (option) => {
     let returnOption = null;
-    if (isRoundTrip && checker.returnStart && option.departure_token) {
+    if (isRoundTrip && returnDate && option.departure_token) {
       const returnUrl = new URL(url);
       returnUrl.searchParams.set("departure_token", option.departure_token);
       const returnResponse = await fetch(returnUrl);
@@ -512,7 +523,7 @@ async function ticketCheckerFlights(checker) {
       outbound: "",
       returnOption,
       departureDate: checker.departStart,
-      returnDate: isRoundTrip ? checker.returnStart : "",
+      returnDate: isRoundTrip ? returnDate : "",
       adultCount: checker.adults,
       childCount: (checker.childAges || []).length
     });

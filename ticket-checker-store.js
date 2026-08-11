@@ -75,6 +75,7 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
       direct: Math.min(2, Math.max(0, number(body.maxStops, 1))) === 0,
       maxStops: Math.min(2, Math.max(0, number(body.maxStops, 1))),
       maxDuration: Math.min(48, Math.max(1, number(body.maxDuration, existing.maxDuration || 24))),
+      minTripDays: Math.min(60, Math.max(1, number(body.minTripDays, existing.minTripDays || 7))),
       departStart: text(body.departStart, existing.departStart), departEnd: text(body.departEnd, existing.departEnd),
       returnStart: text(body.returnStart, existing.returnStart), returnEnd: text(body.returnEnd, existing.returnEnd),
       departFrom: Math.min(23, Math.max(0, number(body.departFrom, 7))), departTo: Math.min(24, Math.max(1, number(body.departTo, 18))),
