@@ -125,12 +125,12 @@
     const renderEditorBase=renderEditor;
     renderEditor=function(){
       current=current||fresh();
-      current.minTripDays=Math.min(60,Math.max(1,Number(current.minTripDays||dayDiff(current.departEnd,current.returnStart)||7)));
-      current.maxTripDays=Math.min(90,Math.max(current.minTripDays,Number(current.maxTripDays||Math.max(21,current.minTripDays))));
+      current.minTripDays=Math.min(30,Math.max(1,Number(current.minTripDays||dayDiff(current.departEnd,current.returnStart)||7)));
+      current.maxTripDays=Math.min(30,Math.max(current.minTripDays,Number(current.maxTripDays||Math.max(21,current.minTripDays))));
       renderEditorBase();
       if(current.tripType!=="oneway"){
         const ranges=document.querySelector(".range-fields");
-        if(ranges)ranges.insertAdjacentHTML("afterend",`<div class="stay-filter"><div class="time-head"><b>${t("minStay")}</b><span id="tripDaysLabel">${current.minTripDays}–${current.maxTripDays} ${t("days")}</span></div><div class="stay-ranges"><input aria-label="${t("minStay")} minimum" type="range" min="1" max="90" value="${current.minTripDays}" data-trip-days="min"><input aria-label="${t("minStay")} maximum" type="range" min="1" max="90" value="${current.maxTripDays}" data-trip-days="max"></div><div class="stay-ticks"><span>1</span><span>30</span><span>60</span><span>90</span></div><small>${t("minStayHelp")}</small></div>`);
+        if(ranges)ranges.insertAdjacentHTML("afterend",`<div class="stay-filter"><div class="time-head"><b>${t("minStay")}</b><span id="tripDaysLabel">${current.minTripDays}–${current.maxTripDays} ${t("days")}</span></div><div class="stay-ranges"><input aria-label="${t("minStay")} minimum" type="range" min="1" max="30" value="${current.minTripDays}" data-trip-days="min"><input aria-label="${t("minStay")} maximum" type="range" min="1" max="30" value="${current.maxTripDays}" data-trip-days="max"></div><div class="stay-ticks"><span>1</span><span>10</span><span>20</span><span>30</span></div><small>${t("minStayHelp")}</small></div>`);
       }
     };
     function renderAges(){$("#ages").innerHTML=(current.childAges||[]).map((age,i)=>`<div class="age"><label>${t("children")} ${i+1} <select data-age="${i}">${Array.from({length:18},(_,n)=>`<option value="${n}" ${n==age?"selected":""}>${n}</option>`).join("")}</select></label><button type="button" data-remove-child="${i}">×</button></div>`).join("")}
@@ -148,12 +148,12 @@
     document.addEventListener("click",e=>{const button=e.target.closest("button");if(button?.dataset.tripType){current.tripType=button.dataset.tripType;renderEditor()}},true);
     function enforceTripDuration(changed=""){
       if(!current||current.tripType==="oneway")return;
-      current.minTripDays=Math.min(60,Math.max(1,Number(current.minTripDays||7)));
-      current.maxTripDays=Math.min(90,Math.max(1,Number(current.maxTripDays||21)));
+      current.minTripDays=Math.min(30,Math.max(1,Number(current.minTripDays||7)));
+      current.maxTripDays=Math.min(30,Math.max(1,Number(current.maxTripDays||21)));
       const departureWindow=Math.max(0,dayDiff(current.departStart,current.departEnd));
       if(current.minTripDays>current.maxTripDays-departureWindow){
         if(changed==="max")current.minTripDays=Math.max(1,current.maxTripDays-departureWindow);
-        else current.maxTripDays=Math.min(90,current.minTripDays+departureWindow);
+        else current.maxTripDays=Math.min(30,current.minTripDays+departureWindow);
       }
       const minimumReturn=addDays(current.departEnd,current.minTripDays),maximumReturn=addDays(current.departStart,current.maxTripDays);
       if(!current.returnStart||current.returnStart<minimumReturn){

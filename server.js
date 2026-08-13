@@ -464,8 +464,8 @@ async function ticketCheckerFlights(checker) {
   const existingTripDays = checker.departStart && checker.returnStart
     ? Math.max(1, Math.round((new Date(`${checker.returnStart}T12:00:00`) - new Date(`${checker.departStart}T12:00:00`)) / 86400000))
     : 7;
-  const minTripDays = Math.min(60, Math.max(1, Number(checker.minTripDays || existingTripDays)));
-  const maxTripDays = Math.min(90, Math.max(minTripDays, Number(checker.maxTripDays || Math.max(21, existingTripDays))));
+  const minTripDays = Math.min(30, Math.max(1, Number(checker.minTripDays || existingTripDays)));
+  const maxTripDays = Math.min(30, Math.max(minTripDays, Number(checker.maxTripDays || Math.max(21, existingTripDays))));
   const minimumReturn = new Date(`${checker.departEnd || checker.departStart}T12:00:00`);
   minimumReturn.setDate(minimumReturn.getDate() + minTripDays);
   const minimumReturnDate = minimumReturn.toISOString().slice(0, 10);
@@ -502,30 +502,39 @@ async function ticketCheckerFlights(checker) {
   if (!response.ok || payload.error) throw providerError(payload.error || "Google Flights zoekopdracht mislukt", response.status, payload);
   const outboundOptions = [...(payload.best_flights || []), ...(payload.other_flights || [])]
     .filter((option) => Number(option.price || 0) > 0)
+    .filter((option) => !isRoundTrip || Boolean(option.departure_token))
     .filter(hasSingleAirline)
     .filter((option) => !checker.maxDuration || Number(option.total_duration || 0) <= checker.maxDuration * 60)
     .filter((option) => !checker.direct || (option.flights || []).length <= 1)
     .filter((option) => Math.max(0, (option.flights || []).length - 1) <= checker.maxStops)
-    .slice(0, 3);
+    .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
+    .slice(0, 8);
 
-  const offers = await Promise.all(outboundOptions.map(async (option) => {
+  const offers = [];
+  for (const option of outboundOptions) {
     let returnOption = null;
-    if (isRoundTrip && returnDate && option.departure_token) {
-      const returnUrl = new URL(url);
-      returnUrl.searchParams.set("departure_token", option.departure_token);
-      const returnResponse = await fetch(returnUrl);
-      const returnPayload = await returnResponse.json();
-      if (returnResponse.ok && !returnPayload.error) {
-        returnOption = [...(returnPayload.best_flights || []), ...(returnPayload.other_flights || [])]
-          .filter((candidate) => Number(candidate.price || 0) > 0)
-          .filter(hasSingleAirline)
-          .filter((candidate) => !checker.maxDuration || Number(candidate.total_duration || 0) <= checker.maxDuration * 60)
-          .filter((candidate) => !checker.direct || (candidate.flights || []).length <= 1)
-          .filter((candidate) => Math.max(0, (candidate.flights || []).length - 1) <= checker.maxStops)
-          .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))[0] || null;
+    if (isRoundTrip) {
+      try {
+        const returnUrl = new URL(url);
+        returnUrl.searchParams.set("departure_token", option.departure_token);
+        const returnResponse = await fetch(returnUrl);
+        const returnPayload = await returnResponse.json();
+        if (returnResponse.ok && !returnPayload.error) {
+          returnOption = [...(returnPayload.best_flights || []), ...(returnPayload.other_flights || [])]
+            .filter((candidate) => Number(candidate.price || 0) > 0)
+            .filter((candidate) => (candidate.flights || []).length > 0)
+            .filter(hasSingleAirline)
+            .filter((candidate) => !checker.maxDuration || Number(candidate.total_duration || 0) <= checker.maxDuration * 60)
+            .filter((candidate) => !checker.direct || (candidate.flights || []).length <= 1)
+            .filter((candidate) => Math.max(0, (candidate.flights || []).length - 1) <= checker.maxStops)
+            .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))[0] || null;
+        }
+      } catch {
+        returnOption = null;
       }
+      if (!returnOption) continue;
     }
-    return normalizeSerpOption(option, { name: "Ticket Checker", city: checker.origin }, origin, arrival, {
+    const offer = normalizeSerpOption(option, { name: "Ticket Checker", city: checker.origin }, origin, arrival, {
       outbound: "",
       returnOption,
       departureDate: checker.departStart,
@@ -533,7 +542,14 @@ async function ticketCheckerFlights(checker) {
       adultCount: checker.adults,
       childCount: (checker.childAges || []).length
     });
-  }));
+    if (isRoundTrip && !offer.returnSegments.length) continue;
+    offers.push(offer);
+    if (offers.length === 3) break;
+  }
+
+  if (isRoundTrip && !offers.length) {
+    throw Object.assign(new Error("Google Flights gaf geen complete retourvluchten voor deze zoekopdracht."), { status: 502 });
+  }
 
   return offers.sort((a, b) => a.price - b.price).slice(0, 3);
 }

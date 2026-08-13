@@ -67,8 +67,8 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
     const text = (value, fallback = "") => String(value ?? fallback).trim();
     const number = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
     const resetResults = Boolean(body.resetResults);
-    const minTripDays = Math.min(60, Math.max(1, number(body.minTripDays, existing.minTripDays || 7)));
-    const maxTripDays = Math.min(90, Math.max(minTripDays, number(body.maxTripDays, existing.maxTripDays || Math.max(21, minTripDays))));
+    const minTripDays = Math.min(30, Math.max(1, number(body.minTripDays, existing.minTripDays || 7)));
+    const maxTripDays = Math.min(30, Math.max(minTripDays, number(body.maxTripDays, existing.maxTripDays || Math.max(21, minTripDays))));
     return {
       ...existing,
       origin: text(body.origin, existing.origin), destination: text(body.destination, existing.destination),
@@ -94,15 +94,39 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
     };
   }
 
+  function completeOffers(checker, item) {
+    return (item.offers || []).filter((offer) => checker.tripType === "oneway" || (offer.returnSegments || []).length > 0);
+  }
+
+  function sanitizedFeed(checker) {
+    return (checker.feed || []).map((item) => {
+      const offers = completeOffers(checker, item).sort((a, b) => Number(a.price) - Number(b.price)).slice(0, 3);
+      return offers.length ? { ...item, lowestPrice: Number(offers[0].price), offers } : null;
+    }).filter(Boolean);
+  }
+
+  function historyFromFeed(feed) {
+    const daily = new Map();
+    for (const item of feed) {
+      const date = String(item.checkedAt || "").slice(0, 10);
+      if (!date || !Number(item.lowestPrice)) continue;
+      daily.set(date, Math.min(daily.get(date) || Infinity, Number(item.lowestPrice)));
+    }
+    return [...daily.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, price]) => ({ date, price })).slice(-370);
+  }
+
   function publicChecker(checker) {
     const { lastRunKey, ...safe } = checker;
-    return safe;
+    const feed = sanitizedFeed(checker);
+    return { ...safe, feed, history: historyFromFeed(feed) };
   }
 
   async function runCheck(checker) {
     const offers = await searchFlights(checker);
     const valid = offers.filter((offer) => Number(offer.price) > 0).sort((a, b) => a.price - b.price).slice(0, 3);
     if (!valid.length) throw new Error("Geen vluchtprijzen gevonden voor deze periode.");
+    checker.feed = sanitizedFeed(checker);
+    checker.history = historyFromFeed(checker.feed);
     const now = new Date();
     const date = now.toISOString().slice(0, 10);
     const lowestPrice = valid[0].price;
@@ -127,13 +151,8 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
   }
 
   function rebuildHistory(checker) {
-    const daily = new Map();
-    for (const item of checker.feed || []) {
-      const date = String(item.checkedAt || "").slice(0, 10);
-      if (!date || !Number(item.lowestPrice)) continue;
-      daily.set(date, Math.min(daily.get(date) || Infinity, Number(item.lowestPrice)));
-    }
-    checker.history = [...daily.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, price]) => ({ date, price })).slice(-370);
+    checker.feed = sanitizedFeed(checker);
+    checker.history = historyFromFeed(checker.feed);
   }
 
   router.get("/api/ticket-checkers", asyncRoute(async (req, res) => {
