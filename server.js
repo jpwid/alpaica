@@ -465,12 +465,17 @@ async function ticketCheckerFlights(checker) {
     ? Math.max(1, Math.round((new Date(`${checker.returnStart}T12:00:00`) - new Date(`${checker.departStart}T12:00:00`)) / 86400000))
     : 7;
   const minTripDays = Math.min(60, Math.max(1, Number(checker.minTripDays || existingTripDays)));
-  const minimumReturn = new Date(`${checker.departStart}T12:00:00`);
+  const maxTripDays = Math.min(90, Math.max(minTripDays, Number(checker.maxTripDays || Math.max(21, existingTripDays))));
+  const minimumReturn = new Date(`${checker.departEnd || checker.departStart}T12:00:00`);
   minimumReturn.setDate(minimumReturn.getDate() + minTripDays);
   const minimumReturnDate = minimumReturn.toISOString().slice(0, 10);
+  const maximumReturn = new Date(`${checker.departStart}T12:00:00`);
+  maximumReturn.setDate(maximumReturn.getDate() + maxTripDays);
+  const maximumReturnDate = maximumReturn.toISOString().slice(0, 10);
   const returnDate = checker.returnStart && checker.returnStart >= minimumReturnDate ? checker.returnStart : minimumReturnDate;
-  if (checker.tripType !== "oneway" && checker.returnEnd && returnDate > checker.returnEnd) {
-    throw Object.assign(new Error(`Binnen deze datumranges is geen reis van minimaal ${minTripDays} dagen mogelijk.`), { status: 400 });
+  const availableReturnEnd = checker.returnEnd && checker.returnEnd < maximumReturnDate ? checker.returnEnd : maximumReturnDate;
+  if (checker.tripType !== "oneway" && returnDate > availableReturnEnd) {
+    throw Object.assign(new Error(`Binnen deze datumranges is geen reis van ${minTripDays} tot ${maxTripDays} dagen mogelijk.`), { status: 400 });
   }
   const url = new URL("https://serpapi.com/search.json");
   url.searchParams.set("engine", "google_flights");
@@ -572,11 +577,20 @@ function asyncRoute(handler) {
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[character]));
 
+function readableMinutes(value) {
+  const minutes = Math.max(0, Math.round(Number(value || 0)));
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  if (!hours) return `${remainder} min`;
+  if (!remainder) return `${hours} ${hours === 1 ? "uur" : "uur"}`;
+  return `${hours} uur ${remainder} min`;
+}
+
 function emailSegments(title, segments = [], layovers = []) {
   if (!segments.length) return "";
   return `<h4 style="margin:16px 0 8px">${escapeHtml(title)}</h4>${segments.map((segment, index) => {
     const layover = layovers[index];
-    return `<div style="padding:10px 0;border-top:1px solid #ddd"><strong>${escapeHtml(segment.airline)} ${escapeHtml(segment.flightNumber)}</strong><br>${escapeHtml(segment.departureCode)} ${escapeHtml(segment.departureTime)} → ${escapeHtml(segment.arrivalCode)} ${escapeHtml(segment.arrivalTime)} · ${escapeHtml(segment.duration)} min${layover ? `<br><span style="color:#6b645e">Overstap: ${escapeHtml(layover.code || layover.airport)} · ${escapeHtml(layover.duration)} min</span>` : ""}</div>`;
+    return `<div style="padding:10px 0;border-top:1px solid #ddd"><strong>${escapeHtml(segment.airline)} ${escapeHtml(segment.flightNumber)}</strong><br>${escapeHtml(segment.departureCode)} ${escapeHtml(segment.departureTime)} → ${escapeHtml(segment.arrivalCode)} ${escapeHtml(segment.arrivalTime)} · ${escapeHtml(readableMinutes(segment.duration))}${layover ? `<br><span style="color:#6b645e">Overstap: ${escapeHtml(layover.code || layover.airport)} · ${escapeHtml(readableMinutes(layover.duration))}</span>` : ""}</div>`;
   }).join("")}`;
 }
 
