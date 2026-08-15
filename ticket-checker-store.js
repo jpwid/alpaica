@@ -75,6 +75,7 @@ function createTicketCheckerService({ dataFile, database, searchFlights, notify 
       originCode: text(body.originCode, existing.originCode), destinationCode: text(body.destinationCode, existing.destinationCode),
       email: text(body.email, existing.email).slice(0, 254),
       tripType: body.tripType === "oneway" ? "oneway" : "roundtrip",
+      dateMode: body.dateMode === "stay" ? "stay" : "fixed",
       direct: Math.min(2, Math.max(0, number(body.maxStops, 1))) === 0,
       maxStops: Math.min(2, Math.max(0, number(body.maxStops, 1))),
       maxDuration: Math.min(48, Math.max(1, number(body.maxDuration, existing.maxDuration || 24))),

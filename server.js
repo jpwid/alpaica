@@ -466,15 +466,23 @@ async function ticketCheckerFlights(checker) {
     : 7;
   const minTripDays = Math.min(30, Math.max(1, Number(checker.minTripDays || existingTripDays)));
   const maxTripDays = Math.min(30, Math.max(minTripDays, Number(checker.maxTripDays || Math.max(21, existingTripDays))));
+  const usesStayDuration = checker.dateMode === "stay";
   const minimumReturn = new Date(`${checker.departEnd || checker.departStart}T12:00:00`);
   minimumReturn.setDate(minimumReturn.getDate() + minTripDays);
   const minimumReturnDate = minimumReturn.toISOString().slice(0, 10);
   const maximumReturn = new Date(`${checker.departStart}T12:00:00`);
   maximumReturn.setDate(maximumReturn.getDate() + maxTripDays);
   const maximumReturnDate = maximumReturn.toISOString().slice(0, 10);
-  const returnDate = checker.returnStart && checker.returnStart >= minimumReturnDate ? checker.returnStart : minimumReturnDate;
-  const availableReturnEnd = checker.returnEnd && checker.returnEnd < maximumReturnDate ? checker.returnEnd : maximumReturnDate;
-  if (checker.tripType !== "oneway" && returnDate > availableReturnEnd) {
+  const automaticReturn = new Date(`${checker.departStart}T12:00:00`);
+  automaticReturn.setDate(automaticReturn.getDate() + minTripDays);
+  const automaticReturnDate = automaticReturn.toISOString().slice(0, 10);
+  const returnDate = usesStayDuration
+    ? automaticReturnDate
+    : (checker.returnStart && checker.returnStart >= minimumReturnDate ? checker.returnStart : minimumReturnDate);
+  const availableReturnEnd = usesStayDuration
+    ? maximumReturnDate
+    : (checker.returnEnd && checker.returnEnd < maximumReturnDate ? checker.returnEnd : maximumReturnDate);
+  if (checker.tripType !== "oneway" && !usesStayDuration && returnDate > availableReturnEnd) {
     throw Object.assign(new Error(`Binnen deze datumranges is geen reis van ${minTripDays} tot ${maxTripDays} dagen mogelijk.`), { status: 400 });
   }
   const url = new URL("https://serpapi.com/search.json");
