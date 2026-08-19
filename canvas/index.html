@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#f5f1e9" />
+  <title>Canvas | Stallikerstrasse 41</title>
+  <meta name="description" content="Interactief interieurcanvas voor Stallikerstrasse 41." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Canvas startpagina"><span class="brand-mark">C</span><span><strong>Canvas</strong><small>by Alpaica</small></span></a>
+    <div class="project-title"><span class="status-dot"></span><span>Stallikerstrasse 41</span><span class="muted">· Erdgeschoss</span></div>
+    <button class="quiet-button" id="resetButton" type="button">Nieuwe sessie</button>
+  </header>
+
+  <main class="workspace">
+    <section class="panel plan-panel" aria-labelledby="planTitle">
+      <div class="panel-heading">
+        <div><p class="eyebrow">01 · Selecteer</p><h1 id="planTitle">Waar wil je iets veranderen?</h1></div>
+        <div class="view-switch" aria-label="Plattegrondweergave"><button class="active" type="button">Plan</button><button type="button" disabled>3D</button></div>
+      </div>
+      <p class="intro">Klik op een kamer, meubelzone of oppervlak. De gekozen zone wordt gekoppeld aan alle inspiratie die je daarna toevoegt.</p>
+
+      <div class="plan-stage" id="planStage">
+        <img src="assets/plattegrond-woning.png" alt="Plattegrond van de erfpachtwoning op de begane grond" />
+        <button class="zone active" style="--x:9%;--y:23%;--w:29%;--h:22%" data-zone="Woonkamer" data-room="Woonkamer" aria-label="Selecteer woonkamer"><span>Woonkamer</span></button>
+        <button class="zone" style="--x:9%;--y:45%;--w:19%;--h:26%" data-zone="Eetruimte" data-room="Woonkamer" aria-label="Selecteer eetruimte"><span>Eetruimte</span></button>
+        <button class="zone" style="--x:28%;--y:45%;--w:9%;--h:24%" data-zone="Keukeneiland" data-room="Keuken" aria-label="Selecteer keukeneiland"><span>Keukeneiland</span></button>
+        <button class="zone" style="--x:9%;--y:68%;--w:29%;--h:5%" data-zone="Vloer leefruimte" data-room="Woonkamer" aria-label="Selecteer vloer van de leefruimte"><span>Vloer leefruimte</span></button>
+        <button class="zone" style="--x:39%;--y:4%;--w:11%;--h:25%" data-zone="Reduit" data-room="Reduit" aria-label="Selecteer reduit"><span>Reduit</span></button>
+        <button class="zone" style="--x:50%;--y:4%;--w:10%;--h:25%" data-zone="Kamer 4" data-room="Slaapkamer" aria-label="Selecteer kamer 4"><span>Kamer 4</span></button>
+        <button class="zone" style="--x:62%;--y:4%;--w:9%;--h:25%" data-zone="Douche" data-room="Badkamer" aria-label="Selecteer douche"><span>Douche</span></button>
+        <button class="zone" style="--x:41%;--y:43%;--w:11%;--h:34%" data-zone="Kamer 3" data-room="Slaapkamer" aria-label="Selecteer kamer 3"><span>Kamer 3</span></button>
+        <button class="zone" style="--x:58%;--y:43%;--w:11%;--h:36%" data-zone="Kamer 2" data-room="Slaapkamer" aria-label="Selecteer kamer 2"><span>Kamer 2</span></button>
+        <button class="zone" style="--x:79%;--y:43%;--w:17%;--h:40%" data-zone="Master suite" data-room="Slaapkamer" aria-label="Selecteer master suite"><span>Master suite</span></button>
+        <button class="zone" style="--x:81%;--y:44%;--w:15%;--h:19%" data-zone="Masterbadkamer" data-room="Badkamer" aria-label="Selecteer masterbadkamer"><span>Badkamer</span></button>
+      </div>
+
+      <div class="selection-bar"><span class="selection-icon">⌖</span><div><small>Geselecteerde zone</small><strong id="selectedZone">Woonkamer</strong></div><button id="zoneMenuButton" type="button">Alle zones</button></div>
+    </section>
+
+    <section class="panel inspiration-panel" aria-labelledby="inspirationTitle">
+      <div class="panel-heading compact"><div><p class="eyebrow">02 · Verzamel</p><h2 id="inspirationTitle">Jouw inspiratie</h2></div><span class="count" id="photoCount">0</span></div>
+      <p class="intro">Sleep kleuren, materialen of voorbeelden uit je fotomap hierheen. Canvas gebruikt ze alleen voor de geselecteerde zone.</p>
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload inspiratiebeelden">
+        <div class="upload-icon">＋</div><strong>Sleep materiaalbeelden hierheen</strong><span>of kies losse beelden of een hele map</span>
+        <div class="upload-actions"><label class="primary-button" for="fileInput">Foto’s kiezen</label><label class="secondary-button" for="folderInput">Fotomap openen</label></div>
+        <input id="fileInput" type="file" accept="image/*" multiple hidden /><input id="folderInput" type="file" accept="image/*" multiple webkitdirectory hidden />
+      </div>
+      <div class="idea-field"><label for="ideaText">Wat moet ermee gebeuren?</label><textarea id="ideaText" rows="3" placeholder="Bijv. gebruik deze lichte natuursteen op het keukeneiland…"></textarea></div>
+      <div class="photo-grid" id="photoGrid" aria-live="polite"><div class="empty-library"><span>✦</span><p>Je referenties verschijnen hier per zone.</p></div></div>
+      <div class="zone-notes"><span class="rule-icon">✓</span><p><strong>Vaste bouwregel</strong><br />Geen haard midden in de ruimte. Alleen de wandhaard bij het woongedeelte.</p></div>
+    </section>
+
+    <section class="panel preview-panel" aria-labelledby="previewTitle">
+      <div class="panel-heading compact"><div><p class="eyebrow">03 · Genereer</p><h2 id="previewTitle">AI-ontwerpbeeld</h2></div><span class="live-pill"><span></span> Echte beeldbewerking</span></div>
+      <div class="room-tabs" role="tablist" aria-label="Ruimtes"><button class="active" type="button" data-room-tab="Woonkamer">Woonkamer</button><button type="button" data-room-tab="Keuken">Keuken</button><button type="button" data-room-tab="Badkamer">Badkamer</button><button type="button" data-room-tab="Slaapkamer">Slaapkamer</button></div>
+      <figure class="preview-card" id="previewCard">
+        <img id="previewImage" src="assets/woonkamer-basis.png" alt="Conceptbeeld van de woonkamer gezien vanuit de corridor" /><div class="preview-sheen"></div>
+        <figcaption><span id="previewRoom">Woonkamer</span><small id="previewCaption">Zicht vanuit de corridor · basisconcept</small></figcaption>
+        <div class="render-status" id="renderStatus"><span></span><b>Basisbeeld</b></div>
+      </figure>
+      <div class="camera-row" aria-label="Camerastandpunt">
+        <button class="camera active" type="button" data-camera="Corridor"><span class="camera-thumb corridor-thumb"></span><span><strong>Zicht 01</strong><small>Vanuit corridor</small></span></button>
+        <button class="camera" type="button" data-camera="Tuinzijde"><span class="camera-thumb garden-thumb"></span><span><strong>Zicht 02</strong><small>Vanaf tuinzijde</small></span></button>
+      </div>
+      <div class="generation-card"><div><small>AI-bewerking voor</small><strong id="generationTarget">Woonkamer</strong></div><button class="generate-button" id="generateButton" type="button"><span>✦</span> AI-beeld genereren</button><p id="generationHint">De eerste werkende test is beschikbaar voor de Master suite.</p></div>
+    </section>
+  </main>
+  <dialog class="access-dialog" id="accessDialog">
+    <form method="dialog" id="accessForm">
+      <button class="dialog-close" id="accessClose" aria-label="Sluiten" type="button">×</button>
+      <p class="eyebrow">Beveiligde AI-functie</p>
+      <h2>Ontgrendel Canvas</h2>
+      <p>Voer het privéwachtwoord in dat bij Canvas op Hostinger is ingesteld. De OpenAI-sleutel blijft uitsluitend op de server.</p>
+      <label for="accessPassword">Canvas-wachtwoord</label>
+      <input id="accessPassword" name="password" type="password" autocomplete="current-password" required />
+      <p class="form-error" id="accessError" role="alert"></p>
+      <button class="generate-button" id="accessSubmit" type="submit">Ontgrendelen en genereren</button>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

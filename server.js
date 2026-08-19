@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const { createTicketCheckerService } = require("./ticket-checker-store");
+const { createCanvasRouter } = require("./canvas-router");
 
 const root = __dirname;
 const env = loadEnv(path.join(root, ".env"));
@@ -661,6 +662,7 @@ function providerStatus() {
 const app = express();
 
 app.disable("x-powered-by");
+app.use("/api/canvas", createCanvasRouter({ root }));
 app.use(express.json({ limit: "1mb" }));
 const ticketChecker = createTicketCheckerService({
   dataFile: process.env.TICKET_CHECKER_DATA_FILE || path.join(root, "data", "ticket-checkers.json"),
