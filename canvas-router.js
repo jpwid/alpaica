@@ -19,6 +19,10 @@ function createCanvasRouter({ root }) {
 
   router.use(express.json({ limit: "60mb" }));
 
+  router.get("/status", (req, res) => {
+    res.json({ ok: true, passwordConfigured: Boolean(password), apiConfigured: Boolean(apiKey), model });
+  });
+
   function rateLimit(req, res, next) {
     const key = req.ip || req.socket.remoteAddress || "unknown";
     const now = Date.now();
